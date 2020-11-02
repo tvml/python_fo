@@ -1,0 +1,67 @@
+!!python/object:grammar.general.general_grammar.GG
+all_chars: true
+axiom: S
+non_terminals: !!set
+  B: null
+  C: null
+  F: null
+  G: null
+  S: null
+productions:
+  ? !!python/tuple
+  - C
+  - B
+  : !!set
+    ? !!python/tuple
+    - B
+    - C
+    : null
+  ? !!python/tuple
+  - F
+  - B
+  : !!set
+    ? !!python/tuple
+    - b
+    - F
+    : null
+  ? !!python/tuple
+  - F
+  - C
+  : !!set
+    ? !!python/tuple
+    - c
+    - G
+    : null
+  ? !!python/tuple
+  - G
+  : !!set
+    !!python/tuple []: null
+  ? !!python/tuple
+  - G
+  - C
+  : !!set
+    ? !!python/tuple
+    - c
+    - G
+    : null
+  ? !!python/tuple
+  - S
+  : !!set
+    ? !!python/tuple
+    - a
+    - S
+    - B
+    - C
+    : null
+  ? !!python/tuple
+  - S
+  - B
+  : !!set
+    ? !!python/tuple
+    - b
+    - F
+    : null
+terminals: !!set
+  a: null
+  b: null
+  c: null
