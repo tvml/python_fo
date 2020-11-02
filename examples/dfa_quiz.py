@@ -53,6 +53,24 @@ dfa1.draw()
 
 dfa1.report_computation(Tools.tokens('11'))
 
+nfa01 = NFA(
+    states={'q0', 'q1', 'q2', 'q3', 'q4'},
+    input_symbols={'0', '1'},
+    delta={
+        'q0': {'0': {'q1'}, '1': {'q2'}},
+        'q1': {'0': {'q1', 'q3'}, '1': {'q1'}},
+        'q2': {'0': {'q2'}, '1': {'q2', 'q4'}},
+        'q3': {'0': {}},
+        'q4': {'0': {}}
+    },
+    initial_state='q0',
+    final_states={'q3', 'q4'}
+)
+
+nfa01.draw()
+
+nfa01.report_computation(Tools.tokens('11'))
+
 # Definire un ASFD che riconosce il linguaggio $L\subseteq\{0,1\}^*$ definito
 # come $$L = \{w| \mid w\mid = 7i, i\geq 0 \}$$
 
