@@ -25,12 +25,12 @@ from automata.tm.ntm_configuration import NTMConfiguration
 
 # Descrizione di un automa a stati finiti deterministico:
 # - tipo di automa: DFA
-# - insieme degli stati: insieme di stringhe 
+# - insieme degli stati: insieme di stringhe
 # - alfabeto di input: insieme di stringhe
 # - stato iniziale: un simbolo dell'alfabeto
 # - stati finali: un sottoinsieme dell'insieme degli stati
-# - funzione di transizione: dizionario con 
-#     - stati come chiavi 
+# - funzione di transizione: dizionario con
+#     - stati come chiavi
 #     - elementi rappresentati da dizionari con chiavi = simboli dell'alfabeto ed elementi = stati
 
 dfa = DFA(
@@ -43,6 +43,14 @@ dfa = DFA(
     initial_state='q0',
     final_states={'q1'}
 )
+print(dfa)
+print(dfa.rg)
+
+gr = dfa.rg
+gr.productions
+
+d = gr.random_derivation()
+print(d)
 
 dfa1 = DFA(
     states={'q0', 'q1', 'q2', 'q3', 'q4'},
@@ -87,12 +95,12 @@ dfa2.report_computation(Tools.tokens('0010'))
 
 # Descrizione di un automa a stati finiti nondeterministico:
 # - tipo di automa: NFA
-# - insieme degli stati: insieme di stringhe 
+# - insieme degli stati: insieme di stringhe
 # - alfabeto di input: insieme di stringhe
 # - stato iniziale: un simbolo dell'alfabeto
 # - stati finali: un sottoinsieme dell'insieme degli stati
-# - funzione di transizione: dizionario con 
-#     - stati come chiavi 
+# - funzione di transizione: dizionario con
+#     - stati come chiavi
 #     - elementi rappresentati da dizionari con chiavi = simboli dell'alfabeto (o la stringa vuota '') ed elementi = insiemi di stati
 
 nfa = NFA(
@@ -161,16 +169,16 @@ nfa.report_random_deterministic_path(Tools.tokens('operator:operator:digit', sep
 
 # Descrizione di un automa a stati a pila deterministico:
 # - tipo di automa: DPDA
-# - insieme degli stati: insieme di stringhe 
+# - insieme degli stati: insieme di stringhe
 # - alfabeto di input: insieme di stringhe
 # - alfabeto di pila: insieme di stringhe
 # - stato iniziale: un simbolo dell'alfabeto
 # - simbolo inziale nella pila: un simbolo dell'alfabeto di pila
 # - stati finali: un sottoinsieme dell'insieme degli stati
 # - condizione di accettazione: 'F' (stato finale) o 'E' (pila vuota)
-# - funzione di transizione: dizionario con 
-#     - stati come chiavi 
-#     - elementi rappresentati da dizionari con 
+# - funzione di transizione: dizionario con
+#     - stati come chiavi
+#     - elementi rappresentati da dizionari con
 #         - simboli dell'alfabeto come chiavi
 #         - elementi rappresentati da dizionari con
 #             - simboli di pila come chiavi
@@ -235,16 +243,16 @@ dpda1 = DPDA(
 
 # Descrizione di un automa a stati a pila nondeterministico:
 # - tipo di automa: NPDA
-# - insieme degli stati: insieme di stringhe 
+# - insieme degli stati: insieme di stringhe
 # - alfabeto di input: insieme di stringhe
 # - alfabeto di pila: insieme di stringhe
 # - stato iniziale: un simbolo dell'alfabeto
 # - simbolo inziale nella pila: un simbolo dell'alfabeto di pila
 # - stati finali: un sottoinsieme dell'insieme degli stati
 # - condizione di accettazione: 'F' (stato finale) o 'E' (pila vuota)
-# - funzione di transizione: dizionario con 
-#     - stati come chiavi 
-#     - elementi rappresentati da dizionari con 
+# - funzione di transizione: dizionario con
+#     - stati come chiavi
+#     - elementi rappresentati da dizionari con
 #         - simboli dell'alfabeto come chiavi
 #         - elementi rappresentati da dizionari con
 #             - simboli di pila (o la stringa vuota '') come chiavi
@@ -381,15 +389,15 @@ npda1.report_random_deterministic_path(Tools.tokens('aa:b', separator=':'))
 
 # Descrizione di una macchina di Turing deterministica:
 # - tipo di automa: DTM
-# - insieme degli stati: insieme di stringhe 
+# - insieme degli stati: insieme di stringhe
 # - alfabeto di input: insieme di stringhe
 # - alfabeto di nastro: insieme di stringhe, comprendente i simboli di input e il simbolo blank
 # - simbolo blank: simbolo non appartenente all'alfabeto di input
 # - stato iniziale: un simbolo dell'alfabeto
 # - stati finali: un sottoinsieme dell'insieme degli stati
-# - funzione di transizione: dizionario con 
-#     - stati come chiavi 
-#     - elementi rappresentati da dizionari con 
+# - funzione di transizione: dizionario con
+#     - stati come chiavi
+#     - elementi rappresentati da dizionari con
 #         - simboli dell'alfabeto di nastro come chiavi
 #         - elementi rappresentati da tuple di tre elementi
 #             - stato
@@ -575,5 +583,3 @@ stp20 = StateTapePair(state='q2', tape=t20)
 ntmc1 = NTMConfiguration(state_tape_pairs={stp10, stp20}, automaton=ntm1)
 
 ntm1.report_computation(Tools.tokens('abaab'))
-
-

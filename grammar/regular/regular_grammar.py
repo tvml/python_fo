@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Classes and methods for working with left regular grammars."""
 
+import tools.tools as tools
 import grammar.base.grammar_exceptions as ge
 
 import grammar.cf.cf_grammar as cfg
 # import grammar.regular.right_regular_grammar as rrg
-# import automata.fa.dfa as dfa
+import automata.fa.nfa as nfa
 # import regexpr.regex_exceptions as rex
 
 
@@ -54,11 +55,39 @@ class RG(cfg.CFG):
 # Derivation
 
     @property
-    def dfa(self):
+    def nfa(self):
         """Return DFA equivalent to this grammar."""
-        # TO DO
-        dfa = None
-        return dfa
+        grammar = self
+        states = {'q'+nt for nt in grammar.non_terminals}
+        final_state = 'q'+tools.Tools.new_nt_symbol(grammar.non_terminals)
+        states.add(final_state)
+        initial_state = 'q'+grammar.axiom
+        final_states = {final_state}
+        if grammar.null_string_produced:
+            final_states.add(initial_state)
+        delta = {}
+        for state in states:
+            delta[state] = {}
+        for left_part,right_parts in grammar.productions.items():
+            for right_part in right_parts:
+                start_state = 'q'+left_part[0]
+                if len(right_part) == 0:
+                    pass
+                elif len(right_part) == 1:
+                    if right_part[0] in delta[start_state].keys():
+                        delta[start_state][right_part[0]].add(final_state)
+                    else:
+                        delta[start_state][right_part[0]] = {final_state}
+                else:
+                    if right_part[0] in delta[start_state].keys():
+                        delta[start_state][right_part[0]].add('q'+right_part[1])
+                    else:
+                        delta[start_state][right_part[0]] = {'q'+right_part[1]}
+        return nfa.NFA(states=states,
+                    input_symbols = grammar.terminals,
+                    delta=delta,
+                    initial_state = initial_state,
+                    final_states=final_states)
 
     @property
     def rrg(self):

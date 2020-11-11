@@ -11,6 +11,7 @@ import automata.fa.fa_exceptions as fae
 import automata.fa.fa as fa
 import automata.fa.nfa as nfa
 import automata.fa.dfa_configuration as dfac
+import grammar.regular.regular_grammar as rg
 
 
 class DFA(fa.FA):
@@ -86,7 +87,8 @@ class DFA(fa.FA):
         transitions = copy.deepcopy(delta)
         for state, state_transitions in delta.items():
             for input_symbol, is_transition in state_transitions.items():
-                transitions[state][input_symbol] = fa.FATransition(is_transition)
+                transitions[state][input_symbol] = fa.FATransition(
+                    is_transition)
         return transitions
 
 # -----------------------------------------------------------------------------
@@ -278,9 +280,21 @@ class DFA(fa.FA):
     @property
     def rg(self):
         """Return RG equivalent to this DFA."""
-        # TO DO
-        rg = None
-        return rg
+        dfa = self
+        terminals = dfa.input_symbols
+        nonterminals = {'A'+state for state in dfa.states}
+        axiom = 'A'+dfa.initial_state
+        productions = {}
+        for state, transitions in dfa.delta.items():
+            productions[('A'+state,)] = set()
+            for symbol, transition in transitions.items():
+                productions['A'+state].add((symbol, 'A'+transition.state))
+                if state in dfa.final_states:
+                    productions['A'+state].add(symbol)
+        return rg.RG(terminals=terminals,
+                     non_terminals=nonterminals,
+                     axiom=axiom,
+                     productions=productions)
 
     @property
     def total(self):
@@ -318,7 +332,7 @@ class DFA(fa.FA):
     @property
     def unreachable_states(self):
         """Return the states which are not reachable from the initial state."""
-        return self.states-self.reachable_states
+        return self.states - self.reachable_states
 
     @property
     def empty(self):
@@ -330,13 +344,16 @@ class DFA(fa.FA):
 
     def draw(self):
         f = gv.Digraph('finite_state_machine', engine='dot')
-        f.attr(rankdir='LR', size='7,5', fontname='Verdana', style='filled', bgcolor='lightgrey')
-        f.node_attr={'color': 'black', 'fillcolor': 'grey', 'style': 'filled'}
+        f.attr(rankdir='LR', size='7,5', fontname='Verdana',
+               style='filled', bgcolor='lightgrey')
+        f.node_attr = {'color': 'black',
+                       'fillcolor': 'grey', 'style': 'filled'}
         if self.initial_state in self.final_states:
-            f.node(self.initial_state, fillcolor='lightblue', shape='doublecircle')
+            f.node(self.initial_state, fillcolor='lightblue',
+                   shape='doublecircle')
         else:
             f.node(self.initial_state, fillcolor='lightblue', shape='circle')
-        f.node_attr['shape']='doublecircle'
+        f.node_attr['shape'] = 'doublecircle'
         f.attr('node', fillcolor='grey')
         for x in self.final_states:
             f.node(x, shape='doublecircle')
@@ -345,7 +362,7 @@ class DFA(fa.FA):
             dests = {}
             for symbol, dest in transitions.items():
                 if dest.state in dests.keys():
-                    dests[dest.state] = dests[dest.state]+','+symbol
+                    dests[dest.state] = dests[dest.state] + ',' + symbol
                 else:
                     dests[dest.state] = symbol
             for state, symbols in dests.items():

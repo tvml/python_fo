@@ -120,7 +120,7 @@ class Derivation(base.Base):
         if self.steps:
             phrase_tokens = self.steps[-1].next_phrase
         else:
-            phrase_tokens = tuple(grammar.axiom)
+            phrase_tokens = (grammar.axiom,)
         left_part_indices = Step._left_part_occurrences(phrase_tokens, grammar)
         if not left_part_indices:
             return None

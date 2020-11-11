@@ -11,7 +11,7 @@ from grammar.general.general_grammar import GG
 
 # Descrizione di una grammatica:
 # - tipo di grammatica (GG generale, CSG context-sensitive, CFG context-free, RG regolare sinistra, RRG regolare destra)
-# - insieme dei terminali: insieme di stringhe 
+# - insieme dei terminali: insieme di stringhe
 # - insieme dei nonterminali: insieme di stringhe disgiunto
 # - assioma: un nonterminale
 # - produzioni: dizionario con chiavi ed elementi rappresentati da tuple di terminali e non terminali, inclusa la tupla () relativa alla stringa nulla
@@ -22,19 +22,21 @@ rg = RG(
     non_terminals={'S', 'A', 'B'},
     axiom='S',
     productions={
-        ('S',): {('a', 'S'), ('a', 'A'), ('b', 'A'), ()},
-        ('A',): {('b', 'A'), ('b',), ('b', 'B')},
-        ('B',): {('c', 'A'), ('c',)}
+        'S': {('a', 'S'), ('a', 'A'), ('b', 'A'), ()},
+        'A': {('b', 'A'), 'b', ('b', 'B')},
+        'B': {('c', 'A'), 'c'}
     }
 )
-
+rg
 # Stampa della struttura della grammatica
 
 print(rg)
 
-# Generazione di una derivazione casuale
+print(rg.nfa)
 
-d = rg.random_derivation()
+print(rg.nfa.dfa)
+
+d = rg.random_derivation() # Generazione di una derivazione casuale
 
 
 # Stampa della derivazione: nella colonna a sx la sequenza di forme di frasi; nella colonna a dx la sequenza di produzioni applicate
@@ -44,18 +46,20 @@ print(d)
 # CF grammar
 cfg = CFG(
     terminals={'a', 'b', 'c'},
-    non_terminals={'S', 'A', 'B', 'C'},
+    non_terminals={'S', 'AA', 'B', 'C'},
     axiom='S',
     productions={
-        ('S',): {('a', 'S', 'a', 'S'), ('a', 'A'), ('A', 'B')},
-        ('A',): {('b', 'b', 'A', 'B'), ('b', 'b'), ('b', 'A', 'a', 'B'), ('B',)},
-        ('B',): {('c', 'A', 'A'), ('c', 'c'), ('C',), ()},
+        ('S',): {('a', 'S', 'a', 'S'), ('a', 'AA'), ('AA', 'B')},
+        ('AA',): {('b', 'b', 'AA', 'B'), ('b', 'b'), ('b', 'AA', 'a', 'B'), ('B',)},
+        ('B',): {('c', 'AA', 'AA'), ('c', 'c'), ('C',), ()},
         ('C',): {('c', 'C'), ('c',), ('S',)}
     }
 )
 
-
 print(cfg)
+
+
+print(cfg.random_derivation())
 
 cfg0 = CFG(
     terminals={'a'},
@@ -289,5 +293,3 @@ gg2.save('gg2')
 gg20 = Tools.load('gg2')
 
 print(gg20)
-
-
