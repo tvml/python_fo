@@ -56,7 +56,7 @@ class Step(base.Base):
         else:
             for i in range(len(phrase)):
                 for lp in grammar.productions.keys():
-                    if phrase[i:i+len(lp)] == lp:
+                    if phrase[i:i + len(lp)] == lp:
                         left_part_indices.append((i, len(lp)))
         return left_part_indices
 
@@ -74,15 +74,16 @@ class Step(base.Base):
         if self.grammar.all_chars:
             s = '{} -> {}\t\t\t{} => {}'.format(
                 tools.Tools.print(self.left), tools.Tools.print(self.right),
-                tools.Tools.print(self.phrase), tools.Tools.print(self.next_phrase)
-                )
+                tools.Tools.print(self.phrase), tools.Tools.print(
+                    self.next_phrase)
+            )
         else:
             s = '{} -> {}\t\t\t{} => {}'.format(
-                                                tools.Tools.print_tuple(self.left),
-                                                tools.Tools.print_tuple(self.right),
-                                                tools.Tools.print_tuple(self.phrase),
-                                                tools.Tools.print_tuple(self.next_phrase)
-                                                )
+                tools.Tools.print_tuple(self.left),
+                tools.Tools.print_tuple(self.right),
+                tools.Tools.print_tuple(self.phrase),
+                tools.Tools.print_tuple(self.next_phrase)
+            )
         return s
 
 
@@ -126,14 +127,14 @@ class Derivation(base.Base):
             return None
         left_choices = self._select_choices(left_part_indices)
         start_index, length = random.choice(left_choices)
-        lpart_tokens = phrase_tokens[start_index:start_index+length]
+        lpart_tokens = phrase_tokens[start_index:start_index + length]
         choices = self.grammar.get_right_parts(lpart_tokens)
         if choices is None or len(choices) == 0:
             return None
         rpart_tokens = random.choice(list(choices))
         sub_phrases = [phrase_tokens[:start_index],
                        rpart_tokens,
-                       phrase_tokens[start_index+length:]]
+                       phrase_tokens[start_index + length:]]
         next_phrase_tokens = tuple(itertools.chain.from_iterable(sub_phrases))
         return Step(left=lpart_tokens,
                     right=rpart_tokens,
@@ -184,7 +185,7 @@ class Derivation(base.Base):
                 node.father = father
                 father.add_child(node)
                 new_leaves.append(node)
-            new_leaves.extend(leaves[ind+1:])
+            new_leaves.extend(leaves[ind + 1:])
             leaves = new_leaves
         return st
 
@@ -200,22 +201,25 @@ class Derivation(base.Base):
             if self.steps:
                 for step in self.steps:
                     lst = [tools.Tools.print(step.phrase),
-                           tools.Tools.print(step.left)+' -> ' +
+                           tools.Tools.print(step.left) + ' -> ' +
                            tools.Tools.print(step.right)]
                     lstlst.append(lst)
-                lstlst.append([tools.Tools.print(self.steps[-1].next_phrase), ''])
+                lstlst.append(
+                    [tools.Tools.print(self.steps[-1].next_phrase), ''])
             else:
                 lstlst.append([tools.Tools.print(self.grammar.axiom), ''])
         else:
             if self.steps:
                 for step in self.steps:
                     lst = [tools.Tools.print_tuple(step.phrase),
-                           tools.Tools.print_tuple(step.left)+' -> ' +
+                           tools.Tools.print_tuple(step.left) + ' -> ' +
                            tools.Tools.print_tuple(step.right)]
                     lstlst.append(lst)
-                lstlst.append([tools.Tools.print_tuple(self.steps[-1].next_phrase), ''])
+                lstlst.append([tools.Tools.print_tuple(
+                    self.steps[-1].next_phrase), ''])
             else:
-                lstlst.append([tools.Tools.print_tuple(self.grammar.axiom), ''])
+                lstlst.append(
+                    [tools.Tools.print_tuple(self.grammar.axiom), ''])
         return tabulate(lstlst, tablefmt='plain')
 
 

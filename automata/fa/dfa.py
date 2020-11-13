@@ -288,9 +288,9 @@ class DFA(fa.FA):
         for state, transitions in dfa.delta.items():
             productions[('A'+state,)] = set()
             for symbol, transition in transitions.items():
-                productions['A'+state].add((symbol, 'A'+transition.state))
+                productions[('A'+state,)].add((symbol, 'A'+transition.state))
                 if state in dfa.final_states:
-                    productions['A'+state].add(symbol)
+                    productions[('A'+state,)].add(symbol)
         return rg.RG(terminals=terminals,
                      non_terminals=nonterminals,
                      axiom=axiom,

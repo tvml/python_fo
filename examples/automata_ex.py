@@ -31,7 +31,8 @@ from automata.tm.ntm_configuration import NTMConfiguration
 # - stati finali: un sottoinsieme dell'insieme degli stati
 # - funzione di transizione: dizionario con
 #     - stati come chiavi
-#     - elementi rappresentati da dizionari con chiavi = simboli dell'alfabeto ed elementi = stati
+#     - elementi rappresentati da dizionari con chiavi = simboli dell'alfabeto
+#       ed elementi = stati
 
 dfa = DFA(
     states={'q0', 'q1'},
@@ -81,11 +82,16 @@ dfa2 = DFA(
     final_states={'q5'}
 )
 
-# Restituzione della computazione effettuata dall'automa sull'input specificato come tupla di simboli dell'alfabeto. Le righe rappresentano le configurazione attraversate: a sx lo stato, a dx la stringa da leggere. In fondo, esito della computazione.
+# Restituzione della computazione effettuata dall'automa sull'input specificato
+# come tupla di simboli dell'alfabeto. Le righe rappresentano le configurazione
+# attraversate: a sx stato, a dx stringa da leggere. In fondo, esito della
+# computazione.
 
 dfa.report_computation(('expr', 'expr', 'id'))
 
-# La funzione Tools.tokens() permette di specificare una tupla di simboli come stringa composta dalla concatenazione dei simboli stessi, separati dal simbolo specificato come separator
+# La funzione Tools.tokens() permette di specificare una tupla di simboli come
+# stringa composta da concatenazione dei simboli stessi, separati dal simbolo
+# specificato come separator
 
 dfa.report_computation(Tools.tokens('expr:expr:id', separator=':'))
 
@@ -131,7 +137,8 @@ nfa1 = NFA(
 
 # Configurazione di un DFA: stato attuale, lista di simboli da leggere, fornita come tupla. In aggiunta, riferimento all'automa relativo.
 
-dfac = DFAConfiguration(state='q0', list_of_tokens=('id', 'expr'), automaton=dfa)
+dfac = DFAConfiguration(
+    state='q0', list_of_tokens=('id', 'expr'), automaton=dfa)
 
 dfac1 = DFAConfiguration(state='q0', list_of_tokens=('id'), automaton=dfa)
 
@@ -148,11 +155,13 @@ nfac = NFAConfiguration(states={'q0'},
                         list_of_tokens=('digit', 'operator', 'operator'),
                         automaton=nfa)
 
-nfac1 = NFAConfiguration(states={'q0'}, list_of_tokens=('0', '0', '1'), automaton=nfa1)
+nfac1 = NFAConfiguration(
+    states={'q0'}, list_of_tokens=('0', '0', '1'), automaton=nfa1)
 
 # Lista dei simboli fornita come stringa, nel caso in cui i simboli dell'alfabeto siano caratteri
 
-nfac2 = NFAConfiguration.init(states={'q0'}, input_str='111001', automaton=nfa1)
+nfac2 = NFAConfiguration.init(
+    states={'q0'}, input_str='111001', automaton=nfa1)
 
 nfac0 = NFAConfiguration(states={'q0'}, list_of_tokens=(), automaton=nfa)
 
@@ -165,7 +174,8 @@ nfa1.report_computation(Tools.tokens('0100'))
 
 # Restituzione di una sequenza (casuale) di configurazioni deterministiche, derivate dalla computazione nondeterministica eseguita dal NFA sull'input dato.
 
-nfa.report_random_deterministic_path(Tools.tokens('operator:operator:digit', separator=':'))
+nfa.report_random_deterministic_path(
+    Tools.tokens('operator:operator:digit', separator=':'))
 
 # Descrizione di un automa a stati a pila deterministico:
 # - tipo di automa: DPDA
@@ -192,21 +202,21 @@ dpda = DPDA(
     stack_symbols={'SYM1', 'SYM2', 'SYM3'},
     delta={
         'q0': {
-                'id1': {'SYM1': ('q0', Tools.tokens('SYM1:SYM1', separator=':')),
-                        'SYM2': ('q0', Tools.tokens('SYM2:SYM1', separator=':')),
-                        'SYM3': ('q0', ('SYM1',))
-                        },
-                'id2': {'SYM1': ('q0', Tools.tokens('SYM1:SYM2', separator=':')),
-                        'SYM3': ('q0', ('SYM1',))
-                        },
-                'id3': {'SYM1': ('q1',  ('SYM1',)),
-                        'SYM2': ('q1', ('SYM1',)),
-                        'SYM3': ('q1', ())
-                        }
-              },
+            'id1': {'SYM1': ('q0', Tools.tokens('SYM1:SYM1', separator=':')),
+                    'SYM2': ('q0', Tools.tokens('SYM2:SYM1', separator=':')),
+                    'SYM3': ('q0', ('SYM1',))
+                    },
+            'id2': {'SYM1': ('q0', Tools.tokens('SYM1:SYM2', separator=':')),
+                    'SYM3': ('q0', ('SYM1',))
+                    },
+            'id3': {'SYM1': ('q1',  ('SYM1',)),
+                    'SYM2': ('q1', ('SYM1',)),
+                    'SYM3': ('q1', ())
+                    }
+        },
         'q1': {'id1': {'SYM1': ('q1', ())},
                'id2': {'SYM3': ('q1', ())}}
-        },
+    },
     initial_state='q0',
     initial_stack_symbol='SYM3',
     final_states={},
@@ -220,21 +230,21 @@ dpda1 = DPDA(
     stack_symbols={'X', 'Y', 'Z'},
     delta={
         'q0': {
-                'a': {'X': ('q0', Tools.tokens('X:X', separator=':')),
-                      'Y': ('q0', Tools.tokens('Y:Y', separator=':')),
-                      'Z': ('q0', ('X',))
-                      },
-                'b': {'X': ('q0', Tools.tokens('X:Y', separator=':')),
-                      'Z': ('q0', ('X',))
-                      },
-                'c': {'X': ('q1',  ('X',)),
-                      'Y': ('q1', ('Y',)),
-                      'Z': ('q1', ())
-                      }
-              },
+            'a': {'X': ('q0', Tools.tokens('X:X', separator=':')),
+                  'Y': ('q0', Tools.tokens('Y:Y', separator=':')),
+                  'Z': ('q0', ('X',))
+                  },
+            'b': {'X': ('q0', Tools.tokens('X:Y', separator=':')),
+                  'Z': ('q0', ('X',))
+                  },
+            'c': {'X': ('q1',  ('X',)),
+                  'Y': ('q1', ('Y',)),
+                  'Z': ('q1', ())
+                  }
+        },
         'q1': {'a': {'X': ('q1', ())},
                'b': {'Y': ('q1', ())}}
-        },
+    },
     initial_state='q0',
     initial_stack_symbol='X',
     final_states={},
@@ -268,23 +278,23 @@ npda1 = NPDA(
         'q0': {
             '': {
                 '#': {('q0', ())}
-                },
+            },
             'aa': {
                 '#': {('q0', ('A',))},
                 'A': {
-                        ('q0', ('A', 'A')),
-                        ('q1', ()),
-                     },
+                    ('q0', ('A', 'A')),
+                    ('q1', ()),
+                },
                 'BB': {('q0', ('BB', 'A'))}
-                 },
+            },
             'b': {
                 '#': {('q0', ('BB',))},
                 'A': {('q0', ('A', 'BB'))},
                 'BB': {
-                       ('q0', ('BB', 'BB')),
-                       ('q1', ()),
-                     }
-                 }
+                    ('q0', ('BB', 'BB')),
+                    ('q1', ()),
+                }
+            }
         },
         'q1': {
             '': {'#': {('q2', ())}},
@@ -489,7 +499,8 @@ print(t)
 stp = StateTapePair(state='q0', tape=t)
 print(stp)
 
-stp1 = StateTapePair.init(state='q0', input_str='001', head=5, blank_symbol='.')
+stp1 = StateTapePair.init(state='q0', input_str='001',
+                          head=5, blank_symbol='.')
 print(stp1)
 
 # Definizione configurazione DTM, comprendente coppia stato+nastro e automa relativo
@@ -497,7 +508,8 @@ print(stp1)
 dtmc = DTMConfiguration(state_tape_pair=stp, automaton=dtm)
 print(dtmc)
 
-dtmc1 = DTMConfiguration.init(state='q0', input_str='011110', head=9, automaton=dtm)
+dtmc1 = DTMConfiguration.init(
+    state='q0', input_str='011110', head=9, automaton=dtm)
 print(dtmc1)
 
 dtm.report_computation(Tools.tokens('0011'))
@@ -566,7 +578,8 @@ ntm1 = NTM(
 
 
 t1 = TMTape(list_of_tokens=('id1', 'id2', 'x', '.', 'y'), head=4)
-t2 = TMTape(list_of_tokens=Tools.tokens('id2:id2:id2:x:id2', separator=':'), head=2)
+t2 = TMTape(list_of_tokens=Tools.tokens(
+    'id2:id2:id2:x:id2', separator=':'), head=2)
 
 stp1 = StateTapePair(state='q0', tape=t1)
 stp2 = StateTapePair(state='q2', tape=t2)

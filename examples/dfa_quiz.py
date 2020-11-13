@@ -7,8 +7,6 @@
 from tools.tools import Tools
 from automata.fa.dfa import DFA
 from automata.fa.nfa import NFA
-from automata.fa.dfa_configuration import DFAConfiguration
-from automata.fa.nfa_configuration import NFAConfiguration
 
 
 # Definire un ASFD che riconosce il linguaggio $L\subseteq\{0,1\}^*$ definito
@@ -110,7 +108,8 @@ dfa3 = DFA(
 
 dfa3.draw()
 
-# Non specificare un valore per separator in Tools.tokens() corrisponde ad assumere nessun separatore, e quindi che i simboli siano singoli caratteri
+# Non specificare un valore per separator in Tools.tokens() corrisponde ad
+# assumere nessun separatore, e quindi che i simboli siano singoli caratteri
 
 dfa3.report_computation(Tools.tokens('0010'))
 
