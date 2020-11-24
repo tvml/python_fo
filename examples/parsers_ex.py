@@ -4,15 +4,16 @@
 # %cd ..
 
 from tools.tools import Tools
-from grammar.regular.regular_grammar import RG
+# from grammar.regular.regular_grammar import RG
 from grammar.cf.cf_grammar import CFG
-from grammar.cs.cs_grammar import CSG
-from grammar.general.general_grammar import GG
+# from grammar.cs.cs_grammar import CSG
+# from grammar.general.general_grammar import GG
 from parse.cyk.cyk_parser import CYK_parser
 from parse.rd.recursive_descent import RD_parser
 from regexpr.reg_expression import RegEx
 
-# Definizione di grammatica context free in CNF che genera le espressioni regolari sull'alfabeto {a,b,c}
+# Definizione di grammatica context free in CNF che genera le espressioni
+# regolari sull'alfabeto {a,b,c}
 
 er_terminals = {'(', ')', '+', '*', '.'}
 string_alphabet = {'a', 'b', 'c'}
@@ -37,6 +38,8 @@ regex = CFG(
 
 
 print(regex)
+
+print(regex.syntax_tree)
 
 # Definizione di un parser CYK sulla grammatica precedente
 
@@ -88,16 +91,22 @@ regex = CFG(
                 }
         )
 
-re = RegEx(alphabet={'a', 'b'}, expression=('(', '(', 'a', '.', 'b', ')', '*', ')'))
+re = RegEx(alphabet={'a', 'b'},
+           expression=('(', '(', 'a', '.', 'b', ')', '*', ')'))
 
 print(re)
+
+re.syntax_tree
 
 print(re.syntax_tree)
 
 print(re.random_string())
 
-re1 = RegEx(alphabet={'a', 'b'}, expression=(Tools.simple_sequence('(a+b*)*.(a.b)')))
-re2 = RegEx(alphabet={'a', 'b'}, expression=(Tools.simple_sequence('(a+b*)*+(a.b)')))
+re1 = RegEx(alphabet={'a', 'b'},
+            expression=(Tools.simple_sequence('(a+b*)*.(a.b)')))
+
+re2 = RegEx(alphabet={'a', 'b'},
+            expression=(Tools.simple_sequence('(a+b*)*+(a.b)')))
 re3 = RegEx(alphabet={'a', 'b'}, expression=(Tools.simple_sequence('(a.b)')))
 
 
@@ -112,7 +121,8 @@ regex1 = CFG(
         ('A',): {('a',), ('b',), ('c',), ('(', 'A', '+', 'A', ')'),
                  ('(', 'A', '+', 'A', ')', '*'),
                  ('(', 'A', '.', 'A', ')'),
-                 ('(', 'A', '.', 'A', ')', '*'), ('a', '*'), ('b', '*'), ('c', '*')}
+                 ('(', 'A', '.', 'A', ')', '*'), ('a', '*'), ('b', '*'),
+                 ('c', '*')}
                 }
         )
 
@@ -134,5 +144,3 @@ regex2 = CFG(
             )
 
 rd = RD_parser(regex1)
-
-

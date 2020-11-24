@@ -52,7 +52,8 @@ class RegEx(base.Base):
         # add dots
         for i, v in enumerate(tokens):
             if i > 0:
-                if v in terminals.union({'('}) and tokens[i-1] in terminals.union({'*'}):
+                if v in terminals.union({'('}) and\
+                        tokens[i-1] in terminals.union({'*'}):
                     l1.append('.')
                 if v in terminals and tokens[i-1] == ')':
                     l1.append('.')
@@ -209,10 +210,12 @@ class RegEx(base.Base):
                     return check_null(node.children[1])
                 elif node.children[2].symbol == '+':
                     # A->(A+A), B->(A+A)
-                    return check_null(node.children[1]) or check_null(node.children[3])
+                    return check_null(node.children[1]) or\
+                        check_null(node.children[3])
                 else:
                     # A->(A.A), B->(A.A)
-                    return check_null(node.children[1]) and check_null(node.children[3])
+                    return check_null(node.children[1]) and\
+                        check_null(node.children[3])
 
         if not self.expression:
             return True
@@ -227,15 +230,17 @@ class RegEx(base.Base):
     def nfa(self):
         """Return DFA equivalent to this regular expression."""
         # stub: to be completed
-        nfa = None
+        def build_nfa(root):
+
+            return
+        st = self.syntax_tree
+        nfa = build_nfa(st)
         return nfa
 
     @property
     def reg_grammar(self):
         """Return RG equivalent to this regular expression."""
-        # stub: to be completed
-        grammar = None
-        return grammar
+        return self.lr_grammar
 
     @property
     def lr_grammar(self):
