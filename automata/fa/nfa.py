@@ -30,7 +30,7 @@ class NFA(fa.FA):
         *NFA.intersection(nfa1, nfa2): intersection of languages
         *NFA.concat(nfa1, nfa2): concatenation of languages
         *NFA.compl(nfa): complement of language
-        *NFA.kleene(nfa): Kleene closure of language
+        *NFA.kleene(nfa): Kleene closure of languag
 
     A NFA is coded as follows:
         - states are defined as strings
@@ -469,7 +469,7 @@ class NFA(fa.FA):
 # -----------------------------------------------------------------------------
 # Other
 
-            
+
     def draw(self):
         f = gv.Digraph('nondeterministic_finite_state_machine', engine='dot')
         f.attr(rankdir='LR', size='7,5', fontname='Verdana', style='filled', bgcolor='lightgrey')

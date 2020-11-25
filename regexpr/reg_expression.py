@@ -20,6 +20,7 @@ class RegEx(base.Base):
 
         Created by:
         RegEx(): definition provided as call parameters
+        
 
     """
 
@@ -228,7 +229,7 @@ class RegEx(base.Base):
 
     @property
     def nfa(self):
-        """Return DFA equivalent to this regular expression."""
+        """Return NFA equivalent to this regular expression."""
         # stub: to be completed
         def build_nfa(root):
 
