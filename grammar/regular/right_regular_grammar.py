@@ -14,7 +14,7 @@ class RRG(cfg.CFG):
     Created by:
         RRG(): definition provided as call parameters
         RRG.load(file): definition provided in json file
-        *RG.from_rg(): derived from given (left) regular grammar
+        RRG.from_rg(): derived from given (left) regular grammar
 
     A RRG is coded as follows:
         - terminals are defined as strings
@@ -28,6 +28,9 @@ class RRG(cfg.CFG):
                 - keys are input symbols, including the empty string ''
                 - values are sets of possibly empty Python tuples of strings
                 A->a | Aa | '' is coded as productions[('A',)]={('a',), ('A', 'a'), ()}
+                
+    Properties:
+        * rg: equivalent left rg
     """
 
 # -----------------------------------------------------------------------------
@@ -36,7 +39,6 @@ class RRG(cfg.CFG):
     @classmethod
     def from_rg(cls, rg):
         """Initialize this RRG as one equivalent to the given (left) regular grammar."""
-        # TO DO
         return rg.rrg
 
 # -----------------------------------------------------------------------------

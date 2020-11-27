@@ -20,6 +20,13 @@ class RegEx(base.Base):
 
         Created by:
         RegEx(): definition provided as call parameters
+        Regex.from_dfa(): from dfa
+        Regex.from_rg(): from rg
+        
+    Properties:
+        * nfa: equivalent nfa
+        * rg: equivalent rg
+        rrg: equivalent rrg
         
 
     """
@@ -34,6 +41,16 @@ class RegEx(base.Base):
         self.validate()
         self._syntax_tree = self.syntax_tree
         self.includes_null = self._includes_null()
+        
+    @classmethod
+    def from_dfa(cls, dfa):
+        """Initialize this RegEx as one equivalent to the given dfa."""
+        return dfa.regex
+    
+    @classmethod
+    def from_rg(cls, rg):
+        """Initialize this RegEx as one equivalent to the given RG."""
+        return rg.regex
 
     @property
     def canonical(self):
@@ -230,7 +247,7 @@ class RegEx(base.Base):
     @property
     def nfa(self):
         """Return NFA equivalent to this regular expression."""
-        # stub: to be completed
+        # TO DO
         def build_nfa(root):
 
             return
@@ -239,20 +256,20 @@ class RegEx(base.Base):
         return nfa
 
     @property
-    def reg_grammar(self):
-        """Return RG equivalent to this regular expression."""
-        return self.lr_grammar
+    def rrg(self):
+        """Return Right RG equivalent to this regular expression."""
+        return self.rg.rrg
 
     @property
-    def lr_grammar(self):
-        """Return left regular grammar equivalent to this regular expression."""
+    def rg(self):
+        """Return (left) regular grammar equivalent to this regular expression."""
 
         def _lr_grammar_subtree(self, current):
             """
             Return left regular grammar equivalent to the regular expression
             corresponding to the given subtree of the syntax tree.
             """
-            # stub: to be done
+            # TO DO
             rg = None
             return rg
 
@@ -266,8 +283,8 @@ class RegEx(base.Base):
         else:
             st = self.syntax_tree
             current = st.root
-            lrg = _lr_grammar_subtree(current)
-            return lrg
+            rg = _lr_grammar_subtree(current)
+            return rg
 
 # -----------------------------------------------------------------------------
 # Other

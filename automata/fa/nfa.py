@@ -24,13 +24,13 @@ class NFA(fa.FA):
         NFA.from_dfa(nda): derived from given DFA
         NFA.from_epsilon_nfa(nfa): derived from given NFA by eliminating
         epsilon-transitions
-        *NFA.from_rg(rg): derived from given regular grammar
-        *NFA.from_regex(regex): derived from given regular expression
-        *NFA.union(nfa1, nfa2): union of languages
-        *NFA.intersection(nfa1, nfa2): intersection of languages
-        *NFA.concat(nfa1, nfa2): concatenation of languages
-        *NFA.compl(nfa): complement of language
-        *NFA.kleene(nfa): Kleene closure of languag
+        NFA.from_rg(rg): derived from given regular grammar
+        NFA.from_regex(regex): derived from given regular expression
+        NFA.union(nfa1, nfa2): union of languages
+        NFA.intersection(nfa1, nfa2): intersection of languages
+        NFA.concat(nfa1, nfa2): concatenation of languages
+        NFA.compl(nfa): complement of language
+        NFA.kleene(nfa): Kleene closure of languag
 
     A NFA is coded as follows:
         - states are defined as strings
@@ -46,7 +46,19 @@ class NFA(fa.FA):
                 delta(q1,a)={q2, q3} is coded as delta['q1']['a']={'q2','q3'}
                 delta(q1,a)={} is coded as delta['q1']['a']=set()
                 delta(q1,epsilon)={q2, q3} is coded as delta['q1']['']={'q2','q3'}
-
+                
+    Properties:
+        dfa: equivalent dfa
+        nfa_no_null: equivalent nfa with no null transition
+        * complement: nfa accepting complement language
+        * kleene: nfa accepting Kleene closure of accepted language
+        empty: the accepted language is empty?
+        * finite: the accepted language is finite?
+        
+    Functions:
+        * unite: nfa accepting language union of the one accepted by this nfa and the one accepted by given nfa
+        * intersection: nfa accepting language intersection of the one accepted by this nfa and the one accepted by given nfa
+        * concat: nfa accepting language concatenation of the one accepted by this nfa and the one accepted by given nfa
     """
 
 # -----------------------------------------------------------------------------
@@ -241,11 +253,9 @@ class NFA(fa.FA):
 # Predicates
 
     @property
-    def infinite(self):
-        """Return True iff the language accepted by this NFA is infinite."""
-        # TO DO
-        is_infinite = True
-        return is_infinite
+    def finite(self):
+        """Return True iff the language accepted by this NFA is finite."""
+        return self.dfa.finite
 
     @property
     def empty(self):

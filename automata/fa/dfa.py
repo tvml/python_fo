@@ -39,6 +39,18 @@ class DFA(fa.FA):
                 - keys are input symbols
                 - values are strings
                 delta(q1,a)=q2 is coded as delta['q1']['a']='q2'
+                
+    Properties:
+        total: equivalent dfa with total transition function
+        minimal: minimal equivalent dfa
+        nfa: equivalent nfa
+        rg: equivalent rg
+        * regex: equivalent regex
+        empty: the accepted language is empty?
+        * finite: the accepted language is finite?
+        
+    Functions:
+        * equivalent: is equivalent to given dfa?
 
     """
 
@@ -166,17 +178,6 @@ class DFA(fa.FA):
 # -----------------------------------------------------------------------------
 # Derivation
 
-    @property
-    def minimal(self):
-        """Return a minimal DFA equivalent to this DFA."""
-        minimal_dfa = self.total
-        minimal_dfa._remove_unreachable_states()
-        state_pairs_table = minimal_dfa._create_markable_pairs_table()
-        minimal_dfa._mark_pairs_table_initial(state_pairs_table)
-        minimal_dfa._mark_pairs_table_all(state_pairs_table)
-        minimal_dfa._join_unmarked_pairs(state_pairs_table)
-        return minimal_dfa
-
     def _remove_unreachable_states(self):
         """Remove states which are not reachable from the initial state."""
         for state in self.unreachable_states:
@@ -265,6 +266,17 @@ class DFA(fa.FA):
                     self.initial_state = stringified
 
     @property
+    def minimal(self):
+        """Return a minimal DFA equivalent to this DFA."""
+        minimal_dfa = self.total
+        minimal_dfa._remove_unreachable_states()
+        state_pairs_table = minimal_dfa._create_markable_pairs_table()
+        minimal_dfa._mark_pairs_table_initial(state_pairs_table)
+        minimal_dfa._mark_pairs_table_all(state_pairs_table)
+        minimal_dfa._join_unmarked_pairs(state_pairs_table)
+        return minimal_dfa
+    
+    @property
     def nfa(self):
         """Return NFA equivalent to this DFA."""
         dfa = self
@@ -295,6 +307,13 @@ class DFA(fa.FA):
                      non_terminals=nonterminals,
                      axiom=axiom,
                      productions=productions)
+        
+    @property
+    def regex(self):
+        """Return RegEx equivalent to this DFA."""
+        re = None
+        # TO DO
+        return re
 
     @property
     def total(self):
@@ -311,6 +330,17 @@ class DFA(fa.FA):
             new_dfa.delta['q*'] = {k: end_state for k in new_dfa.input_symbols}
             new_dfa.states.add('q*')
         return new_dfa
+    
+    @property
+    def empty(self):
+        """Return True iff the language accepted by this DFA is empty."""
+        return self.final_states.issubset(self.unreachable_states)
+    
+    @property
+    def finite(self):
+        """Return True iff the language accepted by this DFA is finite."""
+        # TO Do
+        return None
 
     @property
     def reachable_states(self):
@@ -334,11 +364,11 @@ class DFA(fa.FA):
         """Return the states which are not reachable from the initial state."""
         return self.states - self.reachable_states
 
-    @property
-    def empty(self):
-        """Return True iff the language accepted by this DFA is empty."""
-        return self.final_states.issubset(self.unreachable_states)
-
+    def equivalent(self, dfa):
+        """Return True if equivalent to the given dfa (same language accepted)."""
+        # TO DO
+        return None
+        
 # -----------------------------------------------------------------------------
 # Other
 

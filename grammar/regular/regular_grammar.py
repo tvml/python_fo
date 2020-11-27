@@ -17,9 +17,9 @@ class RG(cfg.CFG):
     Created by:
         RG(): definition provided as call parameters
         RG.load(file): definition provided in json file
-        *RG.from_rrg(): derived from given right regular grammar
-        *RG.from_dfa(): derived from given DFA
-        *RG.from_regex(): derived from given regular expression
+        RG.from_rrg(): derived from given right regular grammar
+        RG.from_dfa(): derived from given DFA
+        RG.from_regex(): derived from given regular expression
 
     A RG is coded as follows:
         - terminals are defined as strings
@@ -33,12 +33,17 @@ class RG(cfg.CFG):
                 - keys are input symbols, including the empty string ''
                 - values are sets of possibly empty Python tuples of strings
                 A->a | aA | '' is coded as productions[('A',)]={('a',), ('a', 'A'), ()}
+                
+    Properties:
+        nfa: equivalent nfa
+        * rrg: equivalent right rg
+        regex: equivalent regex
     """
 
     @classmethod
-    def from_rrg(cls, right_rg):
+    def from_rrg(cls, rrg):
         """Initialize this RG as one equivalent to the given right regular grammar."""
-        return right_rg.rg
+        return rrg.rg
 
     @classmethod
     def from_dfa(cls, dfa):
@@ -56,7 +61,7 @@ class RG(cfg.CFG):
 
     @property
     def nfa(self):
-        """Return DFA equivalent to this grammar."""
+        """Return NFA equivalent to this grammar."""
         grammar = self
         states = {'q'+nt for nt in grammar.non_terminals}
         final_state = 'q'+tools.Tools.new_nt_symbol(grammar.non_terminals)
@@ -95,6 +100,11 @@ class RG(cfg.CFG):
         # TO DO
         rrg = None
         return rrg
+    
+    @property
+    def regex(self):
+        """Return regex equivalent to this grammar."""
+        return self.nfa.dfa.regex
 
 # -----------------------------------------------------------------------------
 # Validation
