@@ -28,9 +28,10 @@ class NFA(fa.FA):
         NFA.from_regex(regex): derived from given regular expression
         NFA.union(nfa1, nfa2): union of languages
         NFA.intersection(nfa1, nfa2): intersection of languages
+        NFA.difference(nfa1, nfa2): difference of languages
         NFA.concat(nfa1, nfa2): concatenation of languages
         NFA.compl(nfa): complement of language
-        NFA.kleene(nfa): Kleene closure of languag
+        NFA.kleene(nfa): Kleene closure of language
 
     A NFA is coded as follows:
         - states are defined as strings
@@ -50,15 +51,18 @@ class NFA(fa.FA):
     Properties:
         dfa: equivalent dfa
         nfa_no_null: equivalent nfa with no null transition
-        * complement: nfa accepting complement language
+        complement: nfa accepting complement language
         * kleene: nfa accepting Kleene closure of accepted language
         empty: the accepted language is empty?
-        * finite: the accepted language is finite?
+        finite: the accepted language is finite?
+        universal: the accepted language includes all strings?
         
     Functions:
         * unite: nfa accepting language union of the one accepted by this nfa and the one accepted by given nfa
-        * intersection: nfa accepting language intersection of the one accepted by this nfa and the one accepted by given nfa
+        intersection: nfa accepting language intersection of the one accepted by this nfa and the one accepted by given nfa
         * concat: nfa accepting language concatenation of the one accepted by this nfa and the one accepted by given nfa
+        difference: nfa accepting language difference between the one accepted by this nfa and the one accepted by given nfa
+        includes: the given string belongs to the language accepted by this nfa?
     """
 
 # -----------------------------------------------------------------------------
@@ -106,6 +110,14 @@ class NFA(fa.FA):
         by the given nfa's.
         """
         return nfa1.intersect(nfa2)
+    
+    @classmethod
+    def difference(cls, nfa1, nfa2):
+        """
+        Initialize this NFA as one accepting the language difference of those accepted
+        by the given nfa's.
+        """
+        return nfa1.minus(nfa2)
 
     @classmethod
     def concat(cls, nfa1, nfa2):
@@ -177,27 +189,11 @@ class NFA(fa.FA):
                                      state_queue, dfa_delta)
         return dfa.DFA(states=dfa_states, input_symbols=dfa_symbols, delta=dfa_delta,
                        initial_state=dfa_initial_state, final_states=dfa_final_states)
-
-    @classmethod
-    def _next_nfa_states(cls, nfa, current_nfa_states, current_dfa_state,
-                         state_queue, dfa_delta):
-        """Enqueue the next set of current states for the generated DFA."""
-        for input_symbol in nfa.input_symbols:
-            # consider configuration corresponding to this set of states
-            config = nfac.NFAConfiguration.new(current_nfa_states, [input_symbol], nfa)
-            # compute new configuration when the input symbol is read
-            next_config = nfa._next_configuration(config)
-            # derive the next set of states
-            next_nfa_states = next_config.states
-            if next_nfa_states:
-                next_dfa_state = fa.FA._stringify_states(next_nfa_states)
-                dfa_delta[current_dfa_state][input_symbol] = next_dfa_state
-                state_queue.put(next_nfa_states)
-
+        
     @property
     def nfa_no_null(self):
         """Return NFA equivalent to this one, with no null transition."""
-        new_nfa = self.complete_delta_missing_values()
+        new_nfa = self._complete_delta_missing_values()
         new_delta = new_nfa._delete_epsilon_transitions()
         new_nfa.delta = new_delta
         return new_nfa
@@ -216,9 +212,14 @@ class NFA(fa.FA):
         Return a NFA accepting the language intersection of those accepted
         by this nfa and the one given as parameter.
         """
-        # To DO
-        nfa1 = None
-        return nfa1
+        return (self.complement.union(nfa.complement)).complement
+    
+    def minus(self, nfa):
+        """
+        Return a NFA accepting the language difference of the one accepted
+        by this nfa minus the language accepted by the one given as parameter.
+        """
+        return self.complement.union(nfa).complement
 
     def concatenate(self, nfa):
         """
@@ -235,9 +236,10 @@ class NFA(fa.FA):
         Return a NFA accepting the complement language of the one accepted
         by this nfa.
         """
-        # TO DO
-        nfa = None
-        return nfa
+        equiv_total_dfa = self.dfa.total
+        complement_dfa = copy.deepcopy(equiv_total_dfa)
+        complement_dfa.final_states = equiv_total_dfa.states - equiv_total_dfa.final_states
+        return dfa.nfa
 
     @property
     def kleene_closure(self):
@@ -248,6 +250,22 @@ class NFA(fa.FA):
         # TO DO
         nfa = None
         return nfa
+
+    @classmethod
+    def _next_nfa_states(cls, nfa, current_nfa_states, current_dfa_state,
+                         state_queue, dfa_delta):
+        """Enqueue the next set of current states for the generated DFA."""
+        for input_symbol in nfa.input_symbols:
+            # consider configuration corresponding to this set of states
+            config = nfac.NFAConfiguration.new(current_nfa_states, [input_symbol], nfa)
+            # compute new configuration when the input symbol is read
+            next_config = nfa._next_configuration(config)
+            # derive the next set of states
+            next_nfa_states = next_config.states
+            if next_nfa_states:
+                next_dfa_state = fa.FA._stringify_states(next_nfa_states)
+                dfa_delta[current_dfa_state][input_symbol] = next_dfa_state
+                state_queue.put(next_nfa_states)
 
 # -----------------------------------------------------------------------------
 # Predicates
@@ -261,6 +279,11 @@ class NFA(fa.FA):
     def empty(self):
         """Return True iff the language accepted by this NFA is empty."""
         return self.dfa.empty
+    
+    @property
+    def universal(self):
+        """Return True iff the language accepted by this NFA includes all strings."""
+        return self.dfa.universal
 
 # -----------------------------------------------------------------------------
 # Validation
@@ -378,11 +401,6 @@ class NFA(fa.FA):
             if transitions is not None:
                 new_states = new_states.union(
                     {transition.state for transition in transitions})
-#        if not new_states:
-#            raise fae.UndefinedNFATransitionException(
-#                    'no transition defined from ({},{})'.format(
-#                        current_config.next_token,
-#                        current_config.states))
         next_config = current_config.next_configuration(new_states)
         return self._epsilon_closure(next_config)
 
@@ -478,7 +496,6 @@ class NFA(fa.FA):
 
 # -----------------------------------------------------------------------------
 # Other
-
 
     def draw(self):
         f = gv.Digraph('nondeterministic_finite_state_machine', engine='dot')

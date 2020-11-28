@@ -62,7 +62,7 @@ class FA(aut.Automaton, metaclass=abc.ABCMeta):
 # -----------------------------------------------------------------------------
 # Completion
 
-    def complete_delta_missing_values(self):
+    def _complete_delta_missing_values(self):
         """
         Complete transition function with all states and symbols.
 
@@ -107,6 +107,10 @@ class FA(aut.Automaton, metaclass=abc.ABCMeta):
         except KeyError:
             res = None
         return res
+    
+    def includes(self, input):
+        """Return True iff the language accepted by this FA includes the given string."""
+        self.compute(input)[2]
 
 # -----------------------------------------------------------------------------
 # Other

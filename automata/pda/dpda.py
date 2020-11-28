@@ -38,6 +38,10 @@ class DPDA(pd.PDA):
                         a a Python tuple of stack symbols: the internal representation of
                         this pair is as an instance of StateStackPair
                 delta(q1,a,'X')=(q2,ZY) is coded as delta['q1']['a']=('q2', ('Z', 'Y'))
+                
+    Properties:
+        npda: equivalent npda
+        
     """
 
 # -----------------------------------------------------------------------------
@@ -115,21 +119,21 @@ class DPDA(pd.PDA):
 # -----------------------------------------------------------------------------
 # Derivation
 
-        @property
-        def npda(self) -> object:
-            """Return NPDA equivalent to the given DPDA."""
-            dpda = self
-            nfa_delta = {}
+    @property
+    def npda(self) -> object:
+        """Return NPDA equivalent to the given DPDA."""
+        dpda = self
+        nfa_delta = {}
 
-            for start_state, transitions in dpda.delta.items():
-                nfa_delta[start_state] = {}
-                for input_symbol, end_state in transitions.items():
-                    nfa_delta[start_state][input_symbol] = {end_state}
+        for start_state, transitions in dpda.delta.items():
+            nfa_delta[start_state] = {}
+            for input_symbol, end_state in transitions.items():
+                nfa_delta[start_state][input_symbol] = {end_state}
 
-            return npd.NPDA(states=dpda.states, input_symbols=dpda.input_symbols,
-                            delta=nfa_delta, initial_state=dpda.initial_state,
-                            final_states=dpda.final_states,
-                            acceptance_mode=dpda.acceptance_mode)
+        return npd.NPDA(states=dpda.states, input_symbols=dpda.input_symbols,
+                        delta=nfa_delta, initial_state=dpda.initial_state,
+                        final_states=dpda.final_states,
+                        acceptance_mode=dpda.acceptance_mode)
 
 # -----------------------------------------------------------------------------
 # Completion
