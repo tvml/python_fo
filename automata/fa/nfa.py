@@ -204,7 +204,7 @@ class NFA(fa.FA):
         Return a NFA accepting the language union of those accepted
         by this nfa and the one given as parameter.
         """
-        # To DO
+        # TODO
         nfa1 = None
         return nfa1
 
@@ -227,7 +227,7 @@ class NFA(fa.FA):
         Return a NFA accepting the language concatenation of those accepted
         by this nfa and the one given as parameter.
         """
-        # TO DO
+        # TODO
         nfa1 = None
         return nfa1
 
@@ -248,7 +248,7 @@ class NFA(fa.FA):
         Return a NFA accepting the Kleene-closure of the language accepted
         by this nfa.
         """
-        # TO DO
+        # TODO
         nfa = None
         return nfa
 

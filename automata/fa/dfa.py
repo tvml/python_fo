@@ -227,7 +227,7 @@ class DFA(fa.FA):
     def regex(self):
         """Return RegEx equivalent to this DFA."""
         re = None
-        # TO DO
+        # TODO
         return re
 
     @property
@@ -260,7 +260,7 @@ class DFA(fa.FA):
     @property
     def finite(self):
         """Return True iff the language accepted by this DFA is finite."""
-        # TO Do
+        # TODO
         return None
 
     @property

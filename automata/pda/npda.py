@@ -20,10 +20,10 @@ class NPDA(pd.PDA):
     Created by:
     NPDA(): definition provided as call parameters
     NPDA.load(file): definition provided in yaml file
-    *NPDA.from_dpda(nda): derived from given DPDA
-    *NPDA.from_cfg(cfg) derived from given context free grammar
-    *NPDA.accept_final_state(npda): accepting by final state derived from given npda
-    *NPDA.accept_empty_stack(npda): accepting by empty stack derived from given npda
+    NPDA.from_dpda(nda): derived from given DPDA
+    NPDA.from_cfg(cfg) derived from given context free grammar
+    NPDA.accept_final_state(npda): accepting by final state derived from given npda
+    NPDA.accept_empty_stack(npda): accepting by empty stack derived from given npda
 
     A NPDA is coded as follows:
         - states are defined as strings
@@ -49,6 +49,16 @@ class NPDA(pd.PDA):
                                                    ('q1', ('Y',))}
         - acceptance_mode ('E' or 'F') specifies whether the NPDA accepts by empty stack
             or final state
+            
+    Properties:
+        cfg: equivalent cfg
+        empty_stack: equivalent npda accepting by empty stack
+        final_state: equivalent npda accepting by final state
+        * empty: the accepted language is empty?
+        * finite: the accepted language is finite?
+        
+    Functions:
+        * equivalent: is equivalent to given dfa?
     """
 
     def __init__(self, *, states, input_symbols, stack_symbols,
@@ -144,7 +154,7 @@ class NPDA(pd.PDA):
             return self
         else:
             npda = None
-            # TO DO
+            # TODO
             return npda
 
     @property
@@ -154,14 +164,14 @@ class NPDA(pd.PDA):
             return self
         else:
             npda = None
-            # TO DO
+            # TODO
             return npda
 
     @property
     def cfg(self):
         """Return CFG equivalent to this NPDA."""
         cfg = None
-        # TO DO
+        # TODO
         return cfg
 # -----------------------------------------------------------------------------
 # Computation
