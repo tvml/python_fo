@@ -46,6 +46,7 @@ class DFA(fa.FA):
         nfa: equivalent nfa
         rg: equivalent rg
         * regex: equivalent regex
+        * reverse: dfa accepting reverse language
         empty: the accepted language is empty?
         * finite: the accepted language is finite?
         universal: the accepted language includes all strings?
@@ -229,6 +230,13 @@ class DFA(fa.FA):
         re = None
         # TODO
         return re
+    
+    @property
+    def reverse(self):
+        """Return dfa accepting the reverse of the language accepted by this DFA."""
+        dfa = None
+        # TODO
+        return dfa
 
     @property
     def total(self):

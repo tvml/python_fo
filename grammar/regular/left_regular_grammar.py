@@ -7,16 +7,16 @@ import grammar.cf.cf_grammar as cfg
 # import grammar.regular.regular_grammar as rg
 
 
-class RRG(cfg.CFG):
+class LRG(cfg.CFG):
     """
-    A right regular grammar.
+    A left regular grammar.
 
     Created by:
-        RRG(): definition provided as call parameters
-        RRG.load(file): definition provided in json file
-        RRG.from_rg(): derived from given (left) regular grammar
+        LRG(): definition provided as call parameters
+        LRG.load(file): definition provided in json file
+        LRG.from_rg(): derived from given (right) regular grammar
 
-    A RRG is coded as follows:
+    A LRG is coded as follows:
         - terminals are defined as strings
         - the set of terminals is a Python set of strings
         - nonterminals are defined as strings
@@ -30,7 +30,7 @@ class RRG(cfg.CFG):
                 A->a | Aa | '' is coded as productions[('A',)]={('a',), ('A', 'a'), ()}
                 
     Properties:
-        * rg: equivalent left rg
+        * rg: equivalent right rg
     """
 
 # -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class RRG(cfg.CFG):
 
     @classmethod
     def from_rg(cls, rg):
-        """Initialize this RRG as one equivalent to the given (left) regular grammar."""
+        """Initialize this RRG as one equivalent to the given (right) regular grammar."""
         return rg.rrg
 
 # -----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ class RRG(cfg.CFG):
 
     @property
     def rg(self):
-        """Return (left) regular grammar equivalent to this grammar."""
+        """Return (right) regular grammar equivalent to this grammar."""
         # TO DO
         rg = None
         return rg

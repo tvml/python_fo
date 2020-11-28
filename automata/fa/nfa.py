@@ -64,6 +64,7 @@ class NFA(fa.FA):
         difference: nfa accepting language difference between the one accepted by this nfa and the one accepted by given nfa
         includes: the given string belongs to the language accepted by this nfa?
         equivalent: is equivalent to given nfa?
+        reverse: nfa accepting reverse language
     """
 
 # -----------------------------------------------------------------------------
@@ -222,7 +223,7 @@ class NFA(fa.FA):
         """
         return self.complement.union(nfa).complement
 
-    def concatenate(self, nfa):
+    def concat(self, nfa):
         """
         Return a NFA accepting the language concatenation of those accepted
         by this nfa and the one given as parameter.
@@ -243,14 +244,20 @@ class NFA(fa.FA):
         return dfa.nfa
 
     @property
-    def kleene_closure(self):
+    def kleene(self):
         """
-        Return a NFA accepting the Kleene-closure of the language accepted
-        by this nfa.
+        Return a NFA accepting the Kleene-closure of the language accepted by this nfa.
         """
         # TODO
         nfa = None
         return nfa
+    
+    @property
+    def reverse(self):
+        """
+        Return a NFA accepting the reverse of the language accepted by this nfa.
+        """
+        return self.dfa.total.reverse
 
     @classmethod
     def _next_nfa_states(cls, nfa, current_nfa_states, current_dfa_state,

@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-"""Classes and methods for working with left regular grammars."""
+"""Classes and methods for working with right regular grammars."""
 
 import tools.tools as tools
 import grammar.base.grammar_exceptions as ge
 
 import grammar.cf.cf_grammar as cfg
-# import grammar.regular.right_regular_grammar as rrg
 import automata.fa.nfa as nfa
-# import regexpr.regex_exceptions as rex
 
 
 class RG(cfg.CFG):
     """
-    A (left) regular grammar.
+    A (right) regular grammar.
 
     Created by:
         RG(): definition provided as call parameters
         RG.load(file): definition provided in json file
-        RG.from_rrg(): derived from given right regular grammar
+        RG.from_lrg(): derived from given left regular grammar
         RG.from_dfa(): derived from given DFA
         RG.from_regex(): derived from given regular expression
 
@@ -36,7 +34,7 @@ class RG(cfg.CFG):
                 
     Properties:
         nfa: equivalent nfa
-        * rrg: equivalent right rg
+        * lrg: equivalent left rg
         regex: equivalent regex
         complement: rg generating complement language
         * kleene: rg generating Kleene closure of generated language
@@ -54,9 +52,9 @@ class RG(cfg.CFG):
     """
 
     @classmethod
-    def from_rrg(cls, rrg):
-        """Initialize this RG as one equivalent to the given right regular grammar."""
-        return rrg.rg
+    def from_lrg(cls, lrg):
+        """Initialize this RG as one equivalent to the given left regular grammar."""
+        return lrg.rg
 
     @classmethod
     def from_dfa(cls, dfa):
@@ -108,11 +106,11 @@ class RG(cfg.CFG):
                     final_states=final_states)
 
     @property
-    def rrg(self):
-        """Return right regular grammar equivalent to this grammar."""
+    def lrg(self):
+        """Return left regular grammar equivalent to this grammar."""
         # TODO
-        rrg = None
-        return rrg
+        lrg = None
+        return lrg
     
     @property
     def regex(self):

@@ -247,7 +247,7 @@ class RegEx(base.Base):
     @property
     def nfa(self):
         """Return NFA equivalent to this regular expression."""
-        # TO DO
+        # TODO
         def build_nfa(root):
 
             return
