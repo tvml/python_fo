@@ -287,8 +287,7 @@ class DFA(fa.FA):
 
     def equivalent(self, dfa):
         """Return True if equivalent to the given dfa (same language accepted)."""
-        # TO DO
-        return None
+        return self.nfa.equivalent(dfa.nfa)
 
     def _remove_unreachable_states(self):
         """Remove states which are not reachable from the initial state."""

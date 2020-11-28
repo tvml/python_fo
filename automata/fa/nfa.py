@@ -63,6 +63,7 @@ class NFA(fa.FA):
         * concat: nfa accepting language concatenation of the one accepted by this nfa and the one accepted by given nfa
         difference: nfa accepting language difference between the one accepted by this nfa and the one accepted by given nfa
         includes: the given string belongs to the language accepted by this nfa?
+        equivalent: is equivalent to given nfa?
     """
 
 # -----------------------------------------------------------------------------
@@ -284,6 +285,14 @@ class NFA(fa.FA):
     def universal(self):
         """Return True iff the language accepted by this NFA includes all strings."""
         return self.dfa.universal
+    
+    def equivalent(self, nfa):
+        """Return True if equivalent to the given nfa (same language accepted)."""
+        complement_nfa0 = self.complement
+        complement_nfa1 = nfa.complement
+        intersect_0 = self.intersect(complement_nfa1)
+        intersect_1 = nfa.intersect(complement_nfa0)
+        return intersect_0.empty and intersect_1.empty
 
 # -----------------------------------------------------------------------------
 # Validation

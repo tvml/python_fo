@@ -25,7 +25,7 @@ class RegEx(base.Base):
         
     Properties:
         * nfa: equivalent nfa
-        * rg: equivalent rg
+        rg: equivalent rg
         rrg: equivalent rrg
         
 
@@ -263,43 +263,14 @@ class RegEx(base.Base):
     @property
     def rg(self):
         """Return (left) regular grammar equivalent to this regular expression."""
-
-        def _lr_grammar_subtree(self, current):
-            """
-            Return left regular grammar equivalent to the regular expression
-            corresponding to the given subtree of the syntax tree.
-            """
-            # TO DO
-            rg = None
-            return rg
-
-        if not self.expression:
-            return rg.RG(terminals={},
-                         non_terminals={'S'},
-                         axiom='S',
-                         productions={('S',): {()}},
-                         no_null_production=True,
-                         null_string_produced=None)
-        else:
-            st = self.syntax_tree
-            current = st.root
-            rg = _lr_grammar_subtree(current)
-            return rg
+        return self.nfa.rg
 
 # -----------------------------------------------------------------------------
 # Other
 
     def equivalent(self, regex):
         """Return true if this regex is equivalent to the one given in input."""
-        # nfa accepting language L1 described by this regex
-        nfa1 = self.nfa
-        # nfa accepting language L2 described by given regex
-        nfa2 = regex.nfa
-        # nfa accepting L1-L2
-        nfa12 = nf.NFA.intersection(nfa1, nf.NFA.compl(nfa2))
-        # nfa accepting L2-L1
-        nfa21 = nf.NFA.intersection(nfa2, nf.NFA.compl(nfa1))
-        return nfa12.empty and nfa21.empty
+        return self.nfa.equivalent(regex.nfa)
 
     def random_string(self, iteration_probability=.8,
                       iteration_probability_decrease=.65):
