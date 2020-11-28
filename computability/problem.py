@@ -15,3 +15,7 @@ class PCP():
         if i<0 or i>=n:
             raise ce.PCPpair_exception()
         return self.list_of_pairs(i)
+    
+    def __str__(self):
+        for i, pair in enumerate(self.list_of_pairs):
+            print('{}: {} | {}\n'.format(i, pair[0], pair[1]))
