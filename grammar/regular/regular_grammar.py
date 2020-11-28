@@ -110,7 +110,7 @@ class RG(cfg.CFG):
     @property
     def rrg(self):
         """Return right regular grammar equivalent to this grammar."""
-        # TO DO
+        # TODO
         rrg = None
         return rrg
     
