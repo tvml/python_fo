@@ -3,7 +3,7 @@
 """Code for testing automata."""
 
 # %cd ..
-
+#%%
 from tools.tools import Tools
 from automata.fa.dfa import DFA
 from automata.fa.nfa import NFA
@@ -22,7 +22,7 @@ from automata.tm.state_tape_pair import StateTapePair
 from automata.tm.dtm_configuration import DTMConfiguration
 from automata.tm.ntm_configuration import NTMConfiguration
 
-
+#%%
 # Descrizione di un automa a stati finiti deterministico:
 # - tipo di automa: DFA
 # - insieme degli stati: insieme di stringhe
@@ -514,7 +514,7 @@ print(dtmc1)
 
 dtm.report_computation(Tools.tokens('0011'))
 
-
+#%%
 ntm = NTM(
     states={'q0', 'q1', 'q2', 'q3'},
     input_symbols={'id1', 'id2'},
@@ -543,10 +543,10 @@ ntm = NTM(
     blank_symbol='.',
     final_states={'q4'}
 )
-
+#%%
 
 print(ntm)
-
+#%%
 ntm1 = NTM(
     states={'q0', 'q1', 'q2', 'q3'},
     input_symbols={'a', 'b'},
@@ -576,7 +576,80 @@ ntm1 = NTM(
     final_states={'q4'}
 )
 
+#%%
+ntm2 = NTM(
+    states={'q0', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10'},
+    input_symbols={'a', 'b'},
+    tape_symbols={'a', 'b', 'c', 'd', '.'},
+    delta={
+        # ricerca inizio prima sottostringa
+        'q0': {
+            'a': {('q0', 'a', 'R'), ('q1', 'c', 'R')},
+            'b': {('q0', 'b', 'R'), ('q2', 'c', 'R')}
+        },
+        # ricerca inizio seconda sottostringa, caso carattere a letto
+        'q1': {
+            'a': {('q1', 'a', 'R'), ('q3', 'd', 'L')},
+            'b': {('q1', 'b', 'R')}
+        },
+        # ricerca inizio seconda sottostringa, caso carattere b letto
+        'q2': {
+            'a': {('q2', 'a', 'R')},
+            'b': {('q2', 'b', 'R'), ('q3', 'd', 'L')}
+        },
+        # trovato primo match: torna a prima sottostringa 
+        'q3': {
+            'a': {('q3', 'a', 'L')},
+            'b': {('q3', 'b', 'L')},
+            'c': {('q4', 'c', 'R')}
+        },
+        # memorizza altro carattere da prima sottostringa
+        'q4': {
+            'a': {('q5', 'c', 'R')},
+            'b': {('q6', 'c', 'R')}
+        },
+        # ricerca inizio seconda sottostringa, caso carattere a letto
+        'q5': {
+            'a': {('q5', 'a', 'R')},
+            'b': {('q5', 'b', 'R')},
+            'd': {('q7', 'd', 'R')}
+        },
+        # ricerca inizio seconda sottostringa, caso carattere b letto
+        'q6': {
+            'a': {('q6', 'a', 'R')},
+            'b': {('q6', 'b', 'R')},
+            'd': {('q8', 'd', 'R')}
+        },
+        # ricerca carattere successivo seconda sottostringa, caso carattere a letto
+        'q7': {
+            'a': {('q9', 'd', 'L')},
+            'd': {('q7', 'd', 'R')}
+        },
+        # ricerca carattere successivo seconda sottostringa, caso carattere b letto
+        'q8': {
+            'b': {('q9', 'd', 'L')},
+            'd': {('q8', 'd', 'R')}
+        },
+        # torna a carattere precedente seconda sottostringa
+        'q9': {
+            'a': {('q10', 'a', 'L')},
+            'b': {('q10', 'b', 'L')},
+            'c': {('q11', 'c', 'R')},
+            'd': {('q9', 'd', 'L')}
+        },
+        # torna a carattere successivo prima sottostringa
+        'q10': {
+            'a': {('q10', 'a', 'L')},
+            'b': {('q10', 'b', 'L')},
+            'c': {('q4', 'c', 'R')}
+        }
+    },
+    initial_state='q0',
+    blank_symbol='.',
+    final_states={'q11'}
+)
 
+#%%
 t1 = TMTape(list_of_tokens=('id1', 'id2', 'x', '.', 'y'), head=4)
 t2 = TMTape(list_of_tokens=Tools.tokens(
     'id2:id2:id2:x:id2', separator=':'), head=2)

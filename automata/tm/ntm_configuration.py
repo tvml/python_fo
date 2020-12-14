@@ -95,6 +95,8 @@ class NTMConfiguration(tmc.TMConfiguration):
     def is_final(self):
         """Return True if this configuration is final."""
         final = True
+        if self.is_accepting:
+            return True
         for pair in self.state_tape_pairs:
             if not self.automaton._undefined_transition(pair.state,
                                                         pair.current_symbol):
