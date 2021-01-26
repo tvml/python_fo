@@ -228,9 +228,9 @@ class NPDA(pd.PDA):
         for pair in config.pairs_iterator:
             new_pairs.add(pair)
             if pair.has_empty_stack:
-                break
+                continue
             try:
-                transitions = self.delta[pair.state]['']['pair.top_of_stack']
+                transitions = self.delta[pair.state][''][pair.top_of_stack]
             except KeyError:
                 transitions = set()
             for transition in transitions:

@@ -47,6 +47,8 @@ dfa = DFA(
 print(dfa)
 print(dfa.rg)
 
+#%%
+
 gr = dfa.rg
 gr.productions
 
@@ -308,6 +310,70 @@ npda1 = NPDA(
     acceptance_mode='F'
 )
 
+#%%
+npda00 = NPDA(
+    states={'q0', 'q1'},
+    input_symbols={'a', 'b'},
+    stack_symbols={'A', '#'},
+    delta={
+        'q0': {
+            'a': {
+                '#': {('q0', ('#', 'A'))},
+                'A': {('q0', ('A', 'A'))}
+            },
+            'b': {
+                'A': {('q1', ())}
+            }
+        },
+        'q1': {
+            'b': {
+                '#': {('q1', ('#'))},
+                'A': {('q1', ())}
+            },
+            '': {'#': {('q1', ())}}
+        }
+    },
+    initial_state='q0',
+    initial_stack_symbol='#',
+    final_states={},
+    acceptance_mode='E'
+)
+
+#%%
+npda01 = NPDA(
+    states={'q0', 'q1'},
+    input_symbols={'a', 'b'},
+    stack_symbols={'A', '#'},
+    delta={
+        'q0': {
+            'a': {
+                '#': {('q0', ('#', 'A'))},
+                'A': {('q0', ('A', 'A'))}
+            },
+            'b': {
+                'A': {('q1', ())}
+            },
+            '': {'#': {('q1', ())}}
+        },
+        'q1': {
+            'b': {
+                '#': {('q1', ('#'))},
+                'A': {('q1', ())}
+            },
+            '': {'#': {('q1', ())}}
+        }
+    },
+    initial_state='q0',
+    initial_stack_symbol='#',
+    final_states={},
+    acceptance_mode='E'
+)
+
+#%%
+comp=npda01.computation('aabbbb')
+#%%
+npda01.report_computation('aabbbb')
+#%%
 # Restituzione della computazione effettuata dal DPDA sull'input specificato. Le righe rappresentano le configurazione attraversate: a dx l'insieme di simboli da leggere, a sx le coppie, comprendenti stato e contenuto della pila attuali. In fondo, esito della computazione.
 
 dpda.report_computation(Tools.tokens('id1:id1:id2', separator=':'))
@@ -574,6 +640,54 @@ ntm1 = NTM(
     initial_state='q0',
     blank_symbol='.',
     final_states={'q4'}
+)
+
+#%%
+dtm2 = DTM(
+    states={'q0', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6'},
+    input_symbols={'a', 'b'},
+    tape_symbols={'a', 'b', 'c', 'd', '.'},
+    delta={
+        'q0': {
+            'a': {('q0', 'a', 'R')},
+            'b': {('q0', 'b', 'R')}
+        },
+        'q1': {
+            'a': {('q1', 'a', 'R')},
+            'b': {('q1', 'b', 'R')}
+        },
+        # ricerca inizio seconda sottostringa, caso carattere b letto
+        'q2': {
+            'a': {('q2', 'a', 'R')},
+            'b': {('q2', 'b', 'R')}
+        },
+        # trovato primo match: torna a prima sottostringa 
+        'q3': {
+            'a': {('q3', 'a', 'L')},
+            'b': {('q3', 'b', 'L')},
+            'c': {('q4', 'c', 'R')}
+        },
+        # memorizza altro carattere da prima sottostringa
+        'q4': {
+            'a': {('q5', 'c', 'R')},
+            'b': {('q6', 'c', 'R')}
+        },
+        # ricerca inizio seconda sottostringa, caso carattere a letto
+        'q5': {
+            'a': {('q5', 'a', 'R')},
+            'b': {('q5', 'b', 'R')},
+            'd': {('q7', 'd', 'R')}
+        },
+        # ricerca inizio seconda sottostringa, caso carattere b letto
+        'q6': {
+            'a': {('q6', 'a', 'R')},
+            'b': {('q6', 'b', 'R')},
+            'd': {('q8', 'd', 'R')}
+        }
+    },
+    initial_state='q0',
+    blank_symbol='.',
+    final_states={'qF'}
 )
 
 #%%
