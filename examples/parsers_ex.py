@@ -3,7 +3,7 @@
 
 # %cd ..
 
-from tools.tools import Tools
+from tools.tools import tcs.tools
 # from grammar.regular.regular_grammar import RG
 from grammar.cf.cf_grammar import CFG
 # from grammar.cs.cs_grammar import CSG

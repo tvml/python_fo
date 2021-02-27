@@ -4,7 +4,7 @@
 
 # %cd ..
 
-from tools.tools import Tools
+from tools.tools import tcs.tools
 from automata.fa.dfa import DFA
 from automata.fa.nfa import NFA
 

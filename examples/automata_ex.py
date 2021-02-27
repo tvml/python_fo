@@ -4,23 +4,29 @@
 
 # %cd ..
 #%%
-from tools.tools import Tools
-from automata.fa.dfa import DFA
-from automata.fa.nfa import NFA
-from automata.fa.dfa_configuration import DFAConfiguration
-from automata.fa.nfa_configuration import NFAConfiguration
-from automata.pda.dpda import DPDA
-from automata.pda.npda import NPDA
-from automata.pda.stack import PDAStack
-from automata.pda.state_stack_pair import StateStackPair
-from automata.pda.dpda_configuration import DPDAConfiguration
-from automata.pda.npda_configuration import NPDAConfiguration
-from automata.tm.dtm import DTM
-from automata.tm.ntm import NTM
-from automata.tm.tape import TMTape
-from automata.tm.state_tape_pair import StateTapePair
-from automata.tm.dtm_configuration import DTMConfiguration
-from automata.tm.ntm_configuration import NTMConfiguration
+# import sys
+# sys.path.insert(0, "..")
+# sys.path
+import paths  # noqa
+# import sys
+# sys.path
+from tcs.tools.tools import tcs.tools
+from tcs.automata.fa.dfa import DFA
+from tcs.automata.fa.nfa import NFA
+from tcs.automata.fa.dfa_configuration import DFAConfiguration
+from tcs.automata.fa.nfa_configuration import NFAConfiguration
+from tcs.automata.pda.dpda import DPDA
+from tcs.automata.pda.npda import NPDA
+from tcs.automata.pda.stack import PDAStack
+from tcs.automata.pda.state_stack_pair import StateStackPair
+from tcs.automata.pda.dpda_configuration import DPDAConfiguration
+from tcs.automata.pda.npda_configuration import NPDAConfiguration
+from tcs.automata.tm.dtm import DTM
+from tcs.automata.tm.ntm import NTM
+from tcs.automata.tm.tape import TMTape
+from tcs.automata.tm.state_tape_pair import StateTapePair
+from tcs.automata.tm.dtm_configuration import DTMConfiguration
+from tcs.automata.tm.ntm_configuration import NTMConfiguration
 
 #%%
 # Descrizione di un automa a stati finiti deterministico:
@@ -661,7 +667,7 @@ dtm2 = DTM(
             'a': {('q2', 'a', 'R')},
             'b': {('q2', 'b', 'R')}
         },
-        # trovato primo match: torna a prima sottostringa 
+        # trovato primo match: torna a prima sottostringa
         'q3': {
             'a': {('q3', 'a', 'L')},
             'b': {('q3', 'b', 'L')},
@@ -711,7 +717,7 @@ ntm2 = NTM(
             'a': {('q2', 'a', 'R')},
             'b': {('q2', 'b', 'R'), ('q3', 'd', 'L')}
         },
-        # trovato primo match: torna a prima sottostringa 
+        # trovato primo match: torna a prima sottostringa
         'q3': {
             'a': {('q3', 'a', 'L')},
             'b': {('q3', 'b', 'L')},
