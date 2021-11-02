@@ -2,6 +2,7 @@
 """Classes and methods for working with right regular grammars."""
 
 import tcs.tools.tools as tools
+from tcs.tools.tools import Tools
 import tcs.grammar.base.grammar_exceptions as ge
 
 import tcs.grammar.cf.cf_grammar as cfg
@@ -165,6 +166,8 @@ class RG(cfg.CFG):
     def equivalent(self, rg):
         """Return True if equivalent to the given rg (same language generated)."""
         return self.nfa.equivalent(rg.nfa)
+    
+    
     
 # -----------------------------------------------------------------------------
 # Validation

@@ -2,8 +2,8 @@
 """Code for testing."""
 
 # %cd ..
-
-from tools.tools import tcs.tools
+#%%
+from tcs.tools.tools import Tools
 from grammar.regular.regular_grammar import RG
 from grammar.cf.cf_grammar import CFG
 from grammar.cs.cs_grammar import CSG
@@ -293,3 +293,5 @@ gg2.save('gg2')
 gg20 = Tools.load('gg2')
 
 print(gg20)
+
+# %%

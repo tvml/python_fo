@@ -21,7 +21,7 @@ class NFA(fa.FA):
     Created by:
         NFA(): definition provided as call parameters
         NFA.load(file): definition provided in yaml file
-        NFA.from_dfa(nda): derived from given DFA
+        NFA.from_dfa(dfa): derived from given DFA
         NFA.from_epsilon_nfa(nfa): derived from given NFA by eliminating
         epsilon-transitions
         NFA.from_rg(rg): derived from given regular grammar
@@ -52,15 +52,15 @@ class NFA(fa.FA):
         dfa: equivalent dfa
         nfa_no_null: equivalent nfa with no null transition
         complement: nfa accepting complement language
-        * kleene: nfa accepting Kleene closure of accepted language
+        kleene: nfa accepting Kleene closure of accepted language
         empty: the accepted language is empty?
         finite: the accepted language is finite?
         universal: the accepted language includes all strings?
         
     Functions:
-        * unite: nfa accepting language union of the one accepted by this nfa and the one accepted by given nfa
+        unite: nfa accepting language union of the one accepted by this nfa and the one accepted by given nfa
         intersection: nfa accepting language intersection of the one accepted by this nfa and the one accepted by given nfa
-        * concat: nfa accepting language concatenation of the one accepted by this nfa and the one accepted by given nfa
+        concat: nfa accepting language concatenation of the one accepted by this nfa and the one accepted by given nfa
         difference: nfa accepting language difference between the one accepted by this nfa and the one accepted by given nfa
         includes: the given string belongs to the language accepted by this nfa?
         equivalent: is equivalent to given nfa?
@@ -71,11 +71,27 @@ class NFA(fa.FA):
 # Instantiation
 
     def __init__(self, *, states, input_symbols, delta,
-                 initial_state, final_states):
+                initial_state, final_states):
         """Initialize a complete NFA."""
         super().__init__(states, input_symbols, initial_state, final_states)
         self.delta = NFA._transitions_from_delta(delta)
         self.validate()
+        
+        # Crea gli nfa che riconoscono singoli simboli passati in input
+    @classmethod
+    def create_nfa_from_symbol(cls, t):
+        """Returns an automaton acceping the symbol t given in input 
+        """
+        nfa = NFA(
+            states={t+'0', t+'1'},
+            input_symbols={t},
+            delta={
+                t+'0': {t: {t+'1'}},
+                },
+            initial_state = t+'0',
+            final_states={t+'1'}
+        )
+        return(nfa)
 
     @classmethod
     def from_dfa(cls, dfa):
@@ -165,6 +181,11 @@ class NFA(fa.FA):
 # Derivation
 
     @property
+    def no_epsilon(self):
+        """Return a NFA with no epsilon transitions equivalent to this NFA."""
+        return NFA.from_epsilon_nfa(self)
+
+    @property
     def dfa(self):
         """Return a DFA equivalent to this NFA."""
         # compute equivalent nfa with no epsilon transitions
@@ -188,9 +209,9 @@ class NFA(fa.FA):
                 if current_nfa_states.intersection(nfa.final_states):
                     dfa_final_states.add(current_dfa_state)
                 NFA._next_nfa_states(nfa, current_nfa_states, current_dfa_state,
-                                     state_queue, dfa_delta)
+                                    state_queue, dfa_delta)
         return dfa.DFA(states=dfa_states, input_symbols=dfa_symbols, delta=dfa_delta,
-                       initial_state=dfa_initial_state, final_states=dfa_final_states)
+                    initial_state=dfa_initial_state, final_states=dfa_final_states)
         
     @property
     def nfa_no_null(self):
@@ -205,8 +226,34 @@ class NFA(fa.FA):
         Return a NFA accepting the language union of those accepted
         by this nfa and the one given as parameter.
         """
-        # TODO
-        nfa1 = None
+        nfa1 = copy.deepcopy(self)
+        
+        # Stati: unione degli stati dei due automi più uno stato aggiuntivo 'q'
+        nfa1.states = nfa1.states.union('q',nfa.states)
+        
+        # Simboli di input: unione dei simboli di input dei due automi
+        nfa1.input_symbols = nfa1.input_symbols.union(nfa.input_symbols)
+        
+        # Stati finali: unione degli stati finali dei due automi più 'q'
+        # se uno degli stati iniziali dei due automi era anche finale
+        # altrimenti è solo l'unione degli stati finali dei due automi
+        if ((nfa1.initial_state in nfa1.final_states) or (nfa.initial_state in nfa.final_states)):
+            nfa1.final_states = nfa1.final_states.union('q',nfa.final_states)
+        else:
+            nfa1.final_states = nfa1.final_states.union(nfa.final_states)
+        
+        # Funzione di transizione: aggiungo alla funzione di transizione di nfa1
+        # le epsilon-transizioni dal nuovo stato iniziale agli stati iniziali dei 
+        # due automi di partenza e poi aggiungo la funzione di transizione di nfa
+        nfa1.delta.update(NFA._transitions_from_delta({'q': {'': {nfa1.initial_state,nfa.initial_state}}}))
+        nfa1.delta.update(nfa.delta)
+        
+        # Stato iniziale: 'q'
+        nfa1.initial_state = 'q'
+        
+        # Elimino le epsilon-transizioni
+        nfa1 = nfa1.from_epsilon_nfa(nfa1)
+        
         return nfa1
 
     def intersect(self, nfa):
@@ -223,13 +270,43 @@ class NFA(fa.FA):
         """
         return self.complement.union(nfa).complement
 
-    def concat(self, nfa):
+    def concatenate(self, nfa):
         """
         Return a NFA accepting the language concatenation of those accepted
         by this nfa and the one given as parameter.
         """
-        # TODO
-        nfa1 = None
+        nfa1 = copy.deepcopy(self)
+        
+        # Stati: unione degli stati dei due automi
+        nfa1.states = nfa1.states.union(nfa.states)
+        
+        # Simboli di input: unione dei simboli di input dei due automi
+        nfa1.input_symbols = nfa1.input_symbols.union(nfa.input_symbols)
+        
+        # Funzione di transizione: per ciascuno stato finale di nfa1 aggiungo 
+        # la epsilon-transizione verso lo stato iniziale di nfa.        
+        for t in nfa1.final_states:
+            if t not in  nfa1.delta.keys():
+                nfa1.delta[t] = {'': {fa.FATransition(nfa.initial_state)}}
+            else:
+                if ('' not in nfa1.delta[t].keys()):
+                    nfa1.delta[t][''] = {fa.FATransition(nfa.initial_state)}
+                else: 
+                    nfa1.delta[t][''].add(fa.FATransition(nfa.initial_state))
+        
+        # Funzione di transizione: aggiungo la funzione di transizione di nfa.            
+        nfa1.delta.update(nfa.delta)
+        
+        # Stati finali: unione degli stati finali di nfa1 ed nfa se lo stato iniziale
+        # di nfa è finale, altrimenti sono solo gli stati finali di nfa
+        if ( nfa.initial_state in nfa.final_states):
+            nfa1.final_states = nfa1.final_states.union(nfa.final_states)
+        else:
+            nfa1.final_states = nfa.final_states
+            
+        # Elimino le epsilon-transizioni
+        nfa1 = nfa1.from_epsilon_nfa(nfa1)
+        
         return nfa1
 
     @property
@@ -241,15 +318,33 @@ class NFA(fa.FA):
         equiv_total_dfa = self.dfa.total
         complement_dfa = copy.deepcopy(equiv_total_dfa)
         complement_dfa.final_states = equiv_total_dfa.states - equiv_total_dfa.final_states
-        return dfa.nfa
+        return complement_dfa.nfa
 
     @property
-    def kleene(self):
+    def kleene_closure(self):
         """
         Return a NFA accepting the Kleene-closure of the language accepted by this nfa.
         """
-        # TODO
-        nfa = None
+        
+        nfa = copy.deepcopy(self)
+        
+        # Funzione di transizione: per ciascuno stato finale di nfa aggiungo la 
+        # epsilon-transizione verso lo stato iniziale
+        for t in nfa.final_states:
+            if t not in  nfa.delta.keys():
+                nfa.delta[t] = {'': {fa.FATransition(nfa.initial_state)}}
+            else:
+                if ('' not in nfa.delta[t].keys()):
+                    nfa.delta[t][''] = {fa.FATransition(nfa.initial_state)}
+                else: 
+                    nfa.delta[t][''].add(fa.FATransition(nfa.initial_state))
+        
+        # Stati finali: è il solo stato iniziale        
+        nfa.final_states = {nfa.initial_state}
+        
+        # Elimino le espilon transizioni
+        nfa = nfa.from_epsilon_nfa(nfa)
+        
         return nfa
     
     @property
@@ -261,7 +356,7 @@ class NFA(fa.FA):
 
     @classmethod
     def _next_nfa_states(cls, nfa, current_nfa_states, current_dfa_state,
-                         state_queue, dfa_delta):
+                    state_queue, dfa_delta):
         """Enqueue the next set of current states for the generated DFA."""
         for input_symbol in nfa.input_symbols:
             # consider configuration corresponding to this set of states
@@ -559,3 +654,61 @@ class NFA(fa.FA):
                 st += '}'
                 s += '\t ({},{}) -> {}\n'.format(start_state, input_symbol, st)
         return s[:-1]
+    
+    
+
+
+# Rinomina gli stati di un automa facendoli iniziare dal simbolo passato in input ('t'), seguito da un numero progressivo
+def rename_states (nfa1, t):
+    """Renames the states of the nfa given in input in order to avoid state repetitions.
+        The new states will start with the letter given in input as t followed by a number 
+    """
+    nfa = copy.deepcopy(nfa1)
+
+    len_states = len(nfa.states) #numero degli stati dell'automa
+    label_list = [] # Lista dei nomi dei nuovi stati
+    states_list = list(nfa.states) #crea una lista degli stati dell'automa
+    states_list.sort() #ordina la lista degli stati
+    states_map = {} #dizionario che mappa i vecchi nomi degli stati nei nuovi
+    new_delta = {} #dizionario delle transizioni con i nomi degli stati aggiornati
+
+    # Creo una lista con i nuovi nomi degli stati dell'automa
+    for i in range (0, len_states):
+        label = t + str(i)
+        label_list.append(label)
+    
+    #Creo una corrispondenza uno a uno tra i vecchi nomi e i nuovi nomi (dizionario che ha come chiavi i vecchi nomi e come valori i nuovi)   
+    for i in range (0, len_states):
+        states_map[states_list[i]] = label_list[i] 
+
+    # Inizio a ridefinire l'automa con i nuovi nomi
+    
+    # Ridefinisco gli stati trasformando in insieme la label_list (che contiene i nomi dei nuovi stati)
+    nfa.states = set(label_list) 
+    
+    # Lo stato iniziale sarà lo stato che nella states_map corrisponde al vecchio stato iniziale
+    nfa.initial_state = states_map[nfa.initial_state]
+
+    # Gli stati finali li ottengo scorrendo l'insieme dei vecchi stati finali e cercando i corrispondenti nella sites_map
+    fs = []
+    for s in nfa.final_states:
+        fs.append(states_map[s])
+    nfa.final_states = set (fs)
+
+    
+    for k in nfa.delta.keys(): #per ciascuna chiave del dizionario delle transizioni (che ha come valori dei dizionari)
+        for j in nfa.delta[k].keys(): #per ciascuna chiave del dizionario valore corrispondente a ciascuna delle chiavi precedenti
+            dl = []            
+            dl = list(nfa.delta[k][j])
+            for l in range (0, len(dl)):
+                if states_map[k] not in new_delta.keys():
+                    new_delta[states_map[k]] = {j: {fa.FATransition(states_map[dl[l].state])}}
+                else:
+                    if (j not in new_delta[states_map[k]].keys()):
+                        new_delta[states_map[k]][j] = {fa.FATransition(states_map[dl[l].state])}
+                    else: 
+                        new_delta[states_map[k]][j].add(fa.FATransition(states_map[dl[l].state]))
+
+    nfa.delta = new_delta
+    
+    return(nfa)

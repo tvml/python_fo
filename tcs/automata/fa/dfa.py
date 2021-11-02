@@ -5,6 +5,7 @@ import copy
 import itertools
 import queue
 import graphviz as gv
+import numpy as np
 
 import tcs.tools.tools as tools
 import tcs.automata.fa.fa_exceptions as fae
@@ -12,6 +13,7 @@ import tcs.automata.fa.fa as fa
 import tcs.automata.fa.nfa as nfa
 import tcs.automata.fa.dfa_configuration as dfac
 import tcs.grammar.regular.regular_grammar as rg
+import tcs.regexpr.reg_expression as re
 
 
 class DFA(fa.FA):
@@ -182,6 +184,34 @@ class DFA(fa.FA):
 # Derivation
 
     @property
+    def renamed_states(self):
+        """Return a copy of this DFA with states renamed as q0, q1, q2, ...."""
+        states_dict = {}
+        i = 1
+        for state in self.states:
+            if state == self.initial_state:
+                states_dict[state] = 'q0'
+            else:
+                states_dict[state] = 'q'+str(i)
+                i+=1
+        new_symbols = self.input_symbols
+        new_states = set(states_dict.values())
+        new_final_states = set([states_dict[state] for state in self.final_states])
+        new_delta = {}
+        for state, transitions in self.delta.items():
+            new_delta[states_dict[state]] = {}
+            for symbol, transition in transitions.items():
+                new_delta[states_dict[state]][symbol] = states_dict[transition.state]
+        dfa_new = DFA(
+            states=new_states,
+            input_symbols=new_symbols,
+            delta=new_delta,
+            initial_state=states_dict[self.initial_state],
+            final_states=new_final_states
+        )
+        return dfa_new
+
+    @property
     def minimal(self):
         """Return a minimal DFA equivalent to this DFA."""
         minimal_dfa = self.total
@@ -199,8 +229,8 @@ class DFA(fa.FA):
         nfa_delta = {}
         for start_state, transitions in dfa.delta.items():
             nfa_delta[start_state] = {}
-            for input_symbol, end_state in transitions.items():
-                nfa_delta[start_state][input_symbol] = {end_state}
+            for input_symbol, transition in transitions.items():
+                nfa_delta[start_state][input_symbol] = {transition.state}
         return nfa.NFA(states=dfa.states, input_symbols=dfa.input_symbols,
                        delta=nfa_delta, initial_state=dfa.initial_state,
                        final_states=dfa.final_states)
@@ -217,7 +247,7 @@ class DFA(fa.FA):
             productions[('A'+state,)] = set()
             for symbol, transition in transitions.items():
                 productions[('A'+state,)].add((symbol, 'A'+transition.state))
-                if state in dfa.final_states:
+                if transition.state in dfa.final_states:
                     productions[('A'+state,)].add(symbol)
         return rg.RG(terminals=terminals,
                      non_terminals=nonterminals,
@@ -227,9 +257,69 @@ class DFA(fa.FA):
     @property
     def regex(self):
         """Return RegEx equivalent to this DFA."""
-        re = None
-        # TODO
-        return re
+        
+        def union(s1,s2):
+            if not s1:
+                if not s2:
+                    return []
+                else:
+                    return s2
+            else:
+                if not s2:
+                    return s1
+                else:
+                    return ['(']+s1+['+']+s2+[')']
+                
+        def conc(s1,s2):
+            if not s1 or not s2:
+                return []
+            else:
+                return ['(']+s1+['.']+s2+[')']
+            
+        def kleene(s):
+            if not s:
+                return []
+            else:
+                return ['(']+s+['*']+[')']
+        
+        def f(r, row, col, k):
+            s = kleene(r[k-1,k-1,k-1])
+            if len(s)==0:
+                return union(r[row,col,k-1], conc(r[row,k-1,k-1],r[k-1,col,k-1]))
+            else:
+                #print(row, col, k, union(r[row,col,k-1], conc(conc(r[row,k-1,k-1], s),r[k-1,col,k-1])))
+                return union(r[row,col,k-1], conc(conc(r[row,k-1,k-1], s),r[k-1,col,k-1]))
+        
+        n = len(self.states)
+        final_state = list(self.final_states)[0]
+        state_dict = {}
+        for i, state in enumerate(self.states-{self.initial_state, final_state}):
+            state_dict[state] = i+1
+        state_dict[self.initial_state]=0
+        state_dict[final_state]=n-1
+        
+        r = np.full(shape=(n,n,n+1), fill_value='',dtype=object)
+        for i in range(n):
+            for j in range(n):
+                for k in range(n+1):
+                    r[i,j,k]=[]
+        for source, transitions in self.delta.items():
+            for symbol, dest in transitions.items():
+                row = state_dict[source]
+                col = state_dict[dest.state]
+                if not r[row, col, 0]:
+                    r[row, col, 0] = ['(']+[symbol]+[')']
+                else:
+                    r[row, col, 0] = r[row, col]+['+']+['(']+[symbol]+[')']
+                    
+        for k in range(1,n+1):
+            for row in range(n):
+                for col in range(n):
+                    r[row, col, k]=f(r, row, col, k)
+
+        res = re.RegEx(alphabet=self.input_symbols,
+                        expression=(r[0,n-1,n]))
+        return res
 
     @property
     def reverse(self):
@@ -253,6 +343,17 @@ class DFA(fa.FA):
             new_dfa.delta['q*'] = {k: end_state for k in new_dfa.input_symbols}
             new_dfa.states.add('q*')
         return new_dfa
+    
+    @property
+    def complement(self):
+        """
+        Return a DFA accepting the complement language of the one accepted
+        by this dfa.
+        """
+        equiv_total_dfa = self.total
+        complement_dfa = copy.deepcopy(equiv_total_dfa)
+        complement_dfa.final_states = equiv_total_dfa.states - equiv_total_dfa.final_states
+        return complement_dfa
 
     @property
     def empty(self):
@@ -339,7 +440,7 @@ class DFA(fa.FA):
     def _mark_pair(self, s, table):
         table.set_flag_true(s)
         for s1 in table.pairs(s):
-            self._mark_state_table(s1, table)
+            self._mark_pair(s1, table)
         table.pairs(s)
 
     def _join_unmarked_pairs(self, table):

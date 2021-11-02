@@ -232,6 +232,62 @@ class Grammar(base.Base):
             else:
                 break
         return derivation
+    
+    def derivations(self, depth=5):
+        """
+        Return all phrases and strings derived from derivations of length up to depth.
+        """
+        produced = []
+        phrases = []
+        produced.append(set())
+        phrases.append(set())
+        produced[0].add(self.axiom)
+        for d in range(1,depth):
+            produced.append(set())
+            phrases.append(set())
+            for phrase in list(produced[d-1]):
+                for x in self.productions.keys():
+                    lp = ''.join(x)
+                    for ii in range(len(phrase)-len(lp)+1):
+                        s3=phrase[ii:ii+len(lp)]
+                        if s3==lp:
+                            right_parts = self.productions[x]
+                            for rp in right_parts:
+                                s = ''
+                                for j in range(ii):
+                                    s+=phrase[j]
+                                s+=''.join(rp)
+                                for j in range(ii+len(lp),len(phrase)):
+                                    s+=phrase[j]
+                                if set(s).issubset(self.terminals):
+                                    phrases[d].add(s)
+                                else:
+                                    produced[d].add(s)
+        return phrases, produced
+    
+    def derived_strings(self, depth=5):
+        """Prints all strings derived through derivations of length up to depth."""
+        ph, pr = self.derivations(depth=depth)
+        for i,x in enumerate(ph):
+            print(str(i)+': ')
+            for y in x:
+                if len(y)>0:
+                    print(y+' ', end = '')
+                else:
+                    print('_ ', end = '')
+            print()
+            
+    def derived_phrases(self, depth=5):
+        """Prints all phrases derived through derivations of length up to depth."""
+        ph, pr = self.derivations(depth=depth)
+        for i,x in enumerate(pr):
+            print(str(i)+': ')
+            for y in x:
+                if len(y)>0:
+                    print(y+' ', end = '')
+                else:
+                    print('_ ', end = '')
+            print()
 
     def __str__(self):
         """Return a string representation of the grammar."""

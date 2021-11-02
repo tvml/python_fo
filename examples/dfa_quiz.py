@@ -3,12 +3,12 @@
 """Code for testing automata."""
 
 # %cd ..
+#%%
+from tcs.tools.tools import Tools
+from tcs.automata.fa.dfa import DFA
+from tcs.automata.fa.nfa import NFA
 
-from tools.tools import tcs.tools
-from automata.fa.dfa import DFA
-from automata.fa.nfa import NFA
-
-
+#%%
 # Definire un ASFD che riconosce il linguaggio $L\subseteq\{0,1\}^*$ definito
 # come $$L = \{w| w \mbox{ ogni } 0 \mbox{ in } w \mbox{ è seguito
 # immediatamente da almeno due } 1 \}$$
@@ -27,7 +27,12 @@ dfa = DFA(
 
 dfa.draw()
 
-dfa.report_computation(Tools.tokens('001110'))
+#%%
+
+dfa.report_computation(Tools.tokens('00111001'))
+
+
+#%%
 
 # Definire un ASFD che riconosce il linguaggio $L\subseteq\{0,1\}^*$ definito
 # come $$L = \{w| w\not=\varepsilon \mbox{ e il primo simbolo di } w \mbox{ e
@@ -48,7 +53,7 @@ dfa1 = DFA(
 )
 
 dfa1.draw()
-
+#%%
 dfa1.report_computation(Tools.tokens('11'))
 
 nfa01 = NFA(
@@ -278,3 +283,5 @@ nfa2.draw()
 dfa9 = nfa1.dfa
 
 dfa9.draw()
+
+# %%

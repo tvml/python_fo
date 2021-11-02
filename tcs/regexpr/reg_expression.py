@@ -6,12 +6,13 @@ import random
 import tcs.base.base as base
 import tcs.tools.tools as tools
 import tcs.regexpr.regex_exceptions as re
-
 import tcs.automata.fa.nfa as nf
 import tcs.grammar.cf.cf_grammar as cfg
 import tcs.grammar.regular.regular_grammar as rg
 import tcs.parse.rd.recursive_descent as rdp
 import tcs.grammar.cf.syntax_tree as syt
+import string
+import copy
 
 
 class RegEx(base.Base):
@@ -247,13 +248,73 @@ class RegEx(base.Base):
     @property
     def nfa(self):
         """Return NFA equivalent to this regular expression."""
-        # TODO
-        def build_nfa(root):
+        
+        re = copy.deepcopy(self)
+        
+        alphabet = list(string.ascii_lowercase) #lista di tutti i simboli alfabetici minuscoli
+        nfa_dict = {} #dizionario degli automi nfa
+        
+        # Trasformo l'espressione regolare in forma postfissa
+        postfix_re = re.postfix()  
+        
+        # Creo gli nfa che riconoscono i singoli simboli dell'alfabeto dell'espressione regolare e li inserisco nel diz. degli automi
+        for t in re.alphabet:
+            nfa_dict[t] = nf.NFA.create_nfa_from_symbol(t)
+        
+        while (len(postfix_re) > 1):
+                
+            # Cerco la prima lettera dell'alfabeto non ancora utilizzata per creare automi
+            i=0
+            while (alphabet[i] in nfa_dict.keys()):
+                i+=1
+            new_alfa = alphabet[i]
+            
+            # Scorro l'espr. reg. in forma postfissa finchè non incontro un operatore
+            j=0
+            while (postfix_re[j] in nfa_dict.keys()):
+                j+=1        
+                
+            # Se l'operatore letto è un "+" eseguo l'unione dei due operandi che precedono l'operatore; l'automa ottenuto sarà corrispondente
+            # alla lettera new_alfa e gli stati dell'automa vengono rinominati tutti con la lettera new_alfa come iniziale;
+            # Le lettere corrispondenti ai due automi di cui ho fatto l'unione e l'operatore "+" vengono eliminati e sostituiti dalla lettera
+            # corrispondente all' "automa unione"
+            if (postfix_re[j] == '+'):
+                nfa_dict[new_alfa] = nfa_dict[postfix_re[j-2]].union(nfa_dict[postfix_re[j-2]],nfa_dict[postfix_re[j-1]])
+                nfa_dict[new_alfa] = nf.rename_states(nfa_dict[new_alfa], new_alfa)
+                postfix_re[j-2] = new_alfa
+                for k in range (j-1, len(postfix_re)-2):
+                    postfix_re[k] = postfix_re[k+2]
+                postfix_re.pop()
+                postfix_re.pop()
+    
+            
+            # Se l'operatore letto è un "." eseguo la concatenazione dei due operandi che precedono l'operatore; l'automa ottenuto sarà corrispondente
+            # alla lettera new_alfa e gli stati dell'automa vengono rinominati tutti con la lettera new_alfa come iniziale;
+            # Le lettere corrispondenti ai due automi di cui ho fatto la concatenazione e l'operatore "." vengono eliminati e sostituiti dalla lettera
+            # corrispondente all' "automa concatenazione"
+            elif postfix_re[j] == '.':
+                nfa_dict[new_alfa] = nf.NFA.concat(nfa_dict[postfix_re[j-2]],nfa_dict[postfix_re[j-1]])
+                nfa_dict[new_alfa] = nf.rename_states(nfa_dict[new_alfa], new_alfa)
+                postfix_re[j-2] = new_alfa
+                for k in range (j-1, len(postfix_re)-2):
+                    postfix_re[k] = postfix_re[k+2]
+                postfix_re.pop()
+                postfix_re.pop()
+            
+            # Se l'operatore letto è un "*" eseguo l'iterazione dell'operando che lo precede; l'automa ottenuto sarà corrispondente
+            # alla lettera new_alfa e gli stati dell'automa vengono rinominati tutti con la lettera new_alfa come iniziale;
+            # La lettera corrispondente all'automa di cui ho fatto l'iterazione e l'operatore "*" vengono eliminati e sostituiti dalla lettera
+            # corrispondente all' "automa concatenazione"
+            else:
+                
+                nfa_dict[new_alfa] = nfa_dict[postfix_re[j-1]].kleene(nfa_dict[postfix_re[j-1]])
+                nfa_dict[new_alfa] = nf.rename_states(nfa_dict[new_alfa], new_alfa)
+                postfix_re[j-1] = new_alfa
+                for k in range (j, len(postfix_re)-1):
+                    postfix_re[k] = postfix_re[k+1]
+                postfix_re.pop()
+        return (nfa_dict[postfix_re[0]])
 
-            return
-        st = self.syntax_tree
-        nfa = build_nfa(st)
-        return nfa
 
     @property
     def rrg(self):
@@ -263,11 +324,91 @@ class RegEx(base.Base):
     @property
     def rg(self):
         """Return (left) regular grammar equivalent to this regular expression."""
-        return self.nfa.rg
+        return self.nfa.dfa.rg
 
 # -----------------------------------------------------------------------------
 # Other
 
+    def correct_string(self, s):
+        """Returns true iff the given string is described by the regex"""
+        cc, c, a = self.nfa.dfa.compute(s)
+        return a
+
+    @property
+    def postfix(self):
+        """Derive the postfix notation of the regular expression given in input."""
+    
+        def post_order(node):
+            s=[]
+            if type(node).__name__=='Terminal_node':
+                s.append(node.symbol)
+            else:
+                if len(node.children) == 5:
+                    s+=post_order(node.children[1])
+                    s+=post_order(node.children[3])
+                    s.append(node.children[2].symbol)
+                elif len(node.children) == 3:
+                    s+=post_order(node.children[1])
+                elif len(node.children) == 2:
+                    s+=post_order(node.children[0])
+                    s.append(node.children[1].symbol)
+                else:
+                    s+=post_order(node.children[0])
+            return tuple(s)
+        
+        return post_order(self.syntax_tree.root)
+        # operands = self.alphabet #insieme degli simboli (operandi) dell'espressione regolare
+        # expression = self.expression 
+        # operator_prio = {'+': 0, '.': 1, '*': 2} # dizionario che ha come chiavi gli operatori e come valori le loro priorità
+        
+        # postfix_str = [] #stringa finale in notazione postfissa
+        # operator_stack = [] #pila degli operatori
+
+        # for t in expression:
+        
+        #     # Condizione 1: se leggo un operando lo inserisco in "postfix_str"
+        #     if t in operands:
+        #         postfix_str.append(t)
+                
+        #     # Condizione 2: se la pila degli operatori è vuota o contiene una "(" in cima 
+        #     # allora inserisco l'operatore che sto leggendo nella pila
+        #     elif ((len(operator_stack) == 0) or (operator_stack[-1] == '(')):    
+        #         operator_stack.append(t)
+                
+        #     # Condizione 3: se leggo una "(" la inserisco sempre nella pila    
+        #     elif (t == '('):
+        #         operator_stack.append(t) 
+            
+        #     # Condizione 4: se leggo una ")", estraggo gli operatori dalla pila 
+        #     # e li scrivo in "postfix_str" finché non trovo una "(" che elimino senza copiarla
+        #     elif (t == ')'):
+        #         while operator_stack[-1] != '(':
+        #             postfix_str.append(operator_stack[-1])
+        #             operator_stack.pop()
+        #         operator_stack.pop()
+                
+        #     # Condizione 5: se la priorità dell'operatore che sto leggendo è 
+        #     # maggiore o uguale a quella dell'operatore in cima alla pila, allora lo inserisco nella pila
+        #     elif (operator_prio[t] >= operator_prio[operator_stack[-1]]):
+        #         operator_stack.append(t) 
+        
+        #     # Condizione 6: sto leggendo un operatore che ha priorità più bassa rispetto all'operatore in cima alla pila.
+        #     # In questo caso estraggo l'elemento in cima alla pila e lo inserisco in "postfix_str".
+        #     # Ripeto il confronto con il nuovo elemento in cima alla pila.    
+        #     else: 
+        #         while len(operator_stack) != 0 and operator_prio[t] < operator_prio[operator_stack[-1]] and operator_stack[-1] in list(operator_prio.keys()):
+        #             postfix_str.append(operator_stack[-1])
+        #             operator_stack.pop()
+        #         operator_stack.append(t)
+    
+        # # Dopo aver letto tutta l'espressione regolare, se rimangono operatori nella pila 
+        # # li estraggo e li inserisco in "postfix_str" secondo la logica "LIFO"
+        # while (len(operator_stack) > 0):
+        #     postfix_str.append(operator_stack[-1])
+        #     operator_stack.pop()                 
+    
+        # return postfix_str
+    
     def equivalent(self, regex):
         """Return true if this regex is equivalent to the one given in input."""
         return self.nfa.equivalent(regex.nfa)
@@ -389,12 +530,38 @@ class RegEx(base.Base):
     #     d = vars(self).copy()
     #     with open(file+'.json', "w") as f:
     #         json.dump(d, f)
+    
+    @property
+    def simple(self):
+        stack = []
+        for c in self.postfix:
+            if c not in {'+','*','.'}:
+                stack.append([c])
+            elif c=='+':
+                e = ['(']+stack[-2]+[c]+stack[-1]+[')']
+                stack=stack[:-2]
+                stack.append(e)
+            elif c=='.':
+                e = stack[-2]+stack[-1]
+                stack=stack[:-2]
+                stack.append(e)
+            else:
+                stack[-1]=stack[-1]+['*']
+        return stack[-1]
 
     def __str__(self):
         """Return a string representation of the re."""
+        # s = 'alphabet: {}\n'.format(', '.join(sorted(self.alphabet)))
+        # if self.all_chars:
+        #     s += 'expression: {}\n'.format(tools.Tools.print(self.expression))
+        # else:
+        #     s += 'expression: {}\n'.format(tools.Tools.print_tuple(self.expression))
+        # return s
+    
+        """Return a string representation of the re."""
         s = 'alphabet: {}\n'.format(', '.join(sorted(self.alphabet)))
         if self.all_chars:
-            s += 'expression: {}\n'.format(tools.Tools.print(self.expression))
+            s += 'expression: {}\n'.format(tools.Tools.print_tuple(self.simple, separator=''))
         else:
-            s += 'expression: {}\n'.format(tools.Tools.print_tuple(self.expression))
+            s += 'expression: {}\n'.format(tools.Tools.print_tuple(self.simple, separator=' '))
         return s

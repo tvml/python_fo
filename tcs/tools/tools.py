@@ -130,7 +130,7 @@ class Tools():
     def list_of_tokens(input_str=None, separator=None):
         """Return the list of tokens from an input string, under the form of a tuple."""
         if input_str == '':
-            lst = ('',)
+            lst = tuple()#('',)
         elif not input_str:
             lst = tuple()
         elif not separator:
@@ -223,9 +223,9 @@ class Tools():
         elif isinstance(lst, str):
             return '('+lst+')'
         elif len(lst) == 1:
-            return '('+lst[0]+')'
+            return lst[0]#'('+lst[0]+')'
         else:
-            return  '('+separator.join(lst)+')'
+            return  separator.join(lst)#'('+separator.join(lst)+')'
 
     @staticmethod
     def tokens(input_str=None, separator=None):

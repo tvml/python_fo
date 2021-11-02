@@ -142,12 +142,15 @@ class Automaton(base.Base, metaclass=abc.ABCMeta):
         Apply the computation on list_of_tokens in a step-by-step manner.
 
         Yield the current configuration of the DFA at each step.
+        Used as:
+            g = a.computation(tokens)
+            a.step(g)
         """
         try:
             config = next(comp)
             print(config)
         except StopIteration:
-            print(config.is_accepting)
+            print('computation completed')#config.is_accepting)
 
     def compute(self, list_of_tokens):
         """
@@ -237,3 +240,4 @@ class Automaton(base.Base, metaclass=abc.ABCMeta):
         else:
             print('Incomplete path: string rejected')
         return
+    

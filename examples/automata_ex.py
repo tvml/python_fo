@@ -10,7 +10,7 @@
 import paths  # noqa
 # import sys
 # sys.path
-from tcs.tools.tools import tcs.tools
+from tcs.tools.tools import Tools
 from tcs.automata.fa.dfa import DFA
 from tcs.automata.fa.nfa import NFA
 from tcs.automata.fa.dfa_configuration import DFAConfiguration
@@ -27,7 +27,9 @@ from tcs.automata.tm.tape import TMTape
 from tcs.automata.tm.state_tape_pair import StateTapePair
 from tcs.automata.tm.dtm_configuration import DTMConfiguration
 from tcs.automata.tm.ntm_configuration import NTMConfiguration
+from tcs.regexpr.reg_expression import RegEx
 
+#%%
 #%%
 # Descrizione di un automa a stati finiti deterministico:
 # - tipo di automa: DFA
@@ -42,6 +44,43 @@ from tcs.automata.tm.ntm_configuration import NTMConfiguration
 
 dfa = DFA(
     states={'q0', 'q1'},
+    input_symbols={'a', 'b'},
+    delta={
+        'q0': {'a': 'q0', 'b': 'q1'},
+        'q1': {'a': 'q0', 'b': 'q0'}
+    },
+    initial_state='q0',
+    final_states={'q1'}
+)
+print(dfa)
+
+#%%
+dfa.draw()
+#%%
+# Restituzione della computazione effettuata dall'automa sull'input specificato
+# come tupla di simboli dell'alfabeto. Le righe rappresentano le configurazione
+# attraversate: a sx stato, a dx stringa da leggere. In fondo, esito della
+# computazione.
+
+# Tools.tokens trasforma una stringa di caratteri in una sequenza di tokens, 
+# corrispondenti ai caratteri della sequenza
+
+dfa.report_computation(Tools.tokens('aab'))
+
+#%%
+# Descrizione di un automa a stati finiti deterministico:
+# - tipo di automa: DFA
+# - insieme degli stati: insieme di stringhe
+# - alfabeto di input: insieme di stringhe
+# - stato iniziale: un simbolo dell'alfabeto
+# - stati finali: un sottoinsieme dell'insieme degli stati
+# - funzione di transizione: dizionario con
+#     - stati come chiavi
+#     - elementi rappresentati da dizionari con chiavi = simboli dell'alfabeto
+#       ed elementi = stati
+
+dfa0 = DFA(
+    states={'q0', 'q1'},
     input_symbols={'id', 'expr'},
     delta={
         'q0': {'id': 'q0', 'expr': 'q1'},
@@ -50,7 +89,10 @@ dfa = DFA(
     initial_state='q0',
     final_states={'q1'}
 )
-print(dfa)
+print(dfa0)
+
+#%%
+
 print(dfa.rg)
 
 #%%
@@ -141,6 +183,21 @@ nfa1 = NFA(
     initial_state='q0',
     final_states={'q3'}
 )
+
+prova = nfa1.kleene(nfa1)
+
+
+re_1 = RegEx(alphabet={'a','b','c'},
+           expression=('(','a','+','b',')','.','c'))
+
+new_nfa_from_re_1 = re_1.nfa()
+print (new_nfa_from_re_1)
+
+re_2 = RegEx(alphabet={'a','b','c'},
+           expression=('(','a','+','b',')','.','(','a','+','c',')'))
+
+new_nfa_from_re_2 = re_2.nfa()
+print (new_nfa_from_re_2)
 
 
 # Configurazione di un DFA: stato attuale, lista di simboli da leggere, fornita come tupla. In aggiunta, riferimento all'automa relativo.
