@@ -6,7 +6,7 @@ ambiente che consenta la selezione e l'esecuzione di righe di codice.
 
 Ambienti di questo tipo sono l'IDE Spyder, l'editor Atom con plugin Hydrogen,
 l'IDE VSCode (Visual Studio Code), tutti liberamente disponibili. Una
-alternativa è rappresentata dall'utilizzo che Jupyterlab, che consente
+alternativa è rappresentata dall'utilizzo di Jupyterlab, che consente
 l'apertura e l'esecuzione di file Python come notebook Jupyter.
 
 Sia per Spyder, che per Atom, che per VSCode sono disponibili degli ambienti di

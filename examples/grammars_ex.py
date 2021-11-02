@@ -4,10 +4,10 @@
 # %cd ..
 #%%
 from tcs.tools.tools import Tools
-from grammar.regular.regular_grammar import RG
-from grammar.cf.cf_grammar import CFG
-from grammar.cs.cs_grammar import CSG
-from grammar.general.general_grammar import GG
+from tcs.grammar.regular.regular_grammar import RG
+from tcs.grammar.cf.cf_grammar import CFG
+from tcs.grammar.cs.cs_grammar import CSG
+from tcs.grammar.general.general_grammar import GG
 
 # Descrizione di una grammatica:
 # - tipo di grammatica (GG generale, CSG context-sensitive, CFG context-free, RG regolare sinistra, RRG regolare destra)
