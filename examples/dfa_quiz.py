@@ -273,15 +273,6 @@ nfa1.draw()
 
 nfa1.report_computation(Tools.tokens('aabbaa'))
 
-# Definire un ASFND che riconosce il linguaggio $L\subseteq\{a,b\}^*$ definito
-# come $$L_1 = \{ a^nba^m | n,m\geq 0 \}$$
 
-nfa2 = nfa1.nfa_no_null
-
-nfa2.draw()
-
-dfa9 = nfa1.dfa
-
-dfa9.draw()
 
 # %%
