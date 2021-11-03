@@ -199,8 +199,7 @@ class Automaton(base.Base, metaclass=abc.ABCMeta):
         current_config = self._initial_deterministic_configuration(list_of_tokens)
         yield current_config
         while not current_config.is_final:
-            current_config = self._next_random_deterministic_configuration(
-                current_config)
+            current_config = self._next_random_deterministic_configuration(current_config)
             yield current_config
 
     def derive_random_deterministic_path(self, list_of_tokens):

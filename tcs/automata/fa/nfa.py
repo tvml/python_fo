@@ -500,10 +500,11 @@ class NFA(fa.FA):
         initial_config = nfac.NFAConfiguration.initial_configuration(
                         list_of_tokens=list_of_tokens,
                         automaton=self)
-        return self._epsilon_closure(initial_config)
+        return initial_config#self._epsilon_closure(initial_config)
 
     def _next_configuration(self, current_config):
         """Define the next configuration of the nfa."""
+        current_config = self._epsilon_closure(current_config)
         if not current_config.states:
             raise fae.UndefinedNFATransitionException('no transition defined from empty configuration')
         new_states = set()
@@ -543,24 +544,24 @@ class NFA(fa.FA):
 # -----------------------------------------------------------------------------
 # Deterministic paths
 
-    def _deterministic_transition(self, state, input_symbol):
-        """
-        Follow the transition for the given input symbol on the given state.
+    # def _deterministic_transition(self, state, input_symbol):
+    #     """
+    #     Follow the transition for the given input symbol on the given state.
 
-        Raise an error if either the state, or the symbol, or the transition
-        do not exist.
-        """
-        if state not in self.states:
-            raise ae.InvalidInputError(
-                '{} is not a valid state'.format(state))
-        if input_symbol not in self.input_symbols and len(input_symbol) > 0:
-            raise ae.InvalidInputError(
-                '{} is not a valid input symbol'.format(input_symbol))
-        try:
-            res = self.delta[state][input_symbol]
-        except KeyError:
-            res = None
-        return res
+    #     Raise an error if either the state, or the symbol, or the transition
+    #     do not exist.
+    #     """
+    #     if state not in self.states:
+    #         raise ae.InvalidInputError(
+    #             '{} is not a valid state'.format(state))
+    #     if input_symbol not in self.input_symbols and len(input_symbol) > 0:
+    #         raise ae.InvalidInputError(
+    #             '{} is not a valid input symbol'.format(input_symbol))
+    #     try:
+    #         res = self.delta[state][input_symbol]
+    #     except KeyError:
+    #         res = None
+    #     return res
 
     def _initial_deterministic_configuration(self, list_of_tokens):
         """
@@ -572,38 +573,16 @@ class NFA(fa.FA):
                         list_of_tokens=list_of_tokens,
                         automaton=self)
         return initial_config
-
+    
+    
     def _next_random_deterministic_configuration(self, current_config):
         """Define the next configuration in a deterministic path of the nfa."""
-        new_states = set()
-        epsilon_transition_exists = True
-        epsilon_transition_applied = True
-        next_token = ''
-        transitions = self._deterministic_transition(
-                current_config.state,
-                next_token)
-        if transitions is None:
-            epsilon_transition_exists = False
-        if not epsilon_transition_exists or random.choice([0, 1]) == 0:
-            epsilon_transition_applied = False
-            next_token = current_config.next_token
-            transitions = self._deterministic_transition(
-                    current_config.state,
-                    next_token)
-            if transitions is not None:
-                for transition in transitions:
-                    new_states.add(transition.state)
-        if len(new_states) == 0:
-            raise fae.UndefinedNFATransitionException(
-                'no transition defined from ({},{})'.format(
-                    next_token,
-                    current_config.state))
-        next_state = random.choice(list(new_states))
-        if epsilon_transition_applied:
-            next_config = current_config.next_epsilon_configuration(next_state)
-        else:
-            next_config = current_config.next_configuration(next_state)
-        return next_config
+        current_nondet_config = self._next_configuration(current_config.as_nfa_config)
+        if not current_nondet_config.states:
+            raise fae.UndefinedNFATransitionException('no transition defined from empty configuration')
+        next_state = random.choice(list(current_nondet_config.states))
+        return current_config.next_configuration(next_state)
+        
 
 # -----------------------------------------------------------------------------
 # Other

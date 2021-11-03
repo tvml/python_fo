@@ -2,6 +2,7 @@
 """Classes and methods for working with DFA configurations in nfa paths."""
 
 import tcs.automata.fa.dfa_configuration as dfac
+import tcs.automata.fa.nfa_configuration as nfac
 
 
 class DFAConfiguration_in_NFA(dfac.DFAConfiguration):
@@ -62,6 +63,7 @@ class DFAConfiguration_in_NFA(dfac.DFAConfiguration):
 
     @classmethod
     def initial_configuration(cls, list_of_tokens, automaton):
+        #epsilon-automaton = automaton.no_epsilon.
         """Create a DFA initial configuration wrt the input string."""
         return super().initial_configuration(list_of_tokens, automaton)
 
@@ -71,11 +73,17 @@ class DFAConfiguration_in_NFA(dfac.DFAConfiguration):
                                        list_of_tokens=self.rest_of_tokens,
                                        automaton=self.automaton)
 
-    def next_epsilon_configuration(self, next_state):
-        """Return next configuration assuming an epsilon transition."""
-        return DFAConfiguration_in_NFA(state=next_state,
-                                       list_of_tokens=self.list_of_tokens,
-                                       automaton=self.automaton)
+    # def next_epsilon_configuration(self, next_state):
+    #     """Return next configuration assuming an epsilon transition."""
+    #     return DFAConfiguration_in_NFA(state=next_state,
+    #                                    list_of_tokens=self.list_of_tokens,
+    #                                    automaton=self.automaton)
+    
+    @property
+    def as_nfa_config(self):
+        return nfac.NFAConfiguration(states={self.state},
+                             list_of_tokens = self.list_of_tokens,
+                             automaton = self.automaton)
 
     def has_epsilon_transition(self):
         """
