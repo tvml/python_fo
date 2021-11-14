@@ -310,7 +310,7 @@ class DFA(fa.FA):
                 if not r[row, col, 0]:
                     r[row, col, 0] = ['(']+[symbol]+[')']
                 else:
-                    r[row, col, 0] = r[row, col]+['+']+['(']+[symbol]+[')']
+                    r[row, col, 0] = ['(']+r[row, col, 0]+['+']+['(']+[symbol]+[')']+[')']
                     
         for k in range(1,n+1):
             for row in range(n):
